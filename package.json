@@ -10,6 +10,8 @@
     "frontend:build": "npm run build -w frontend",
     "backend:dev": "npm run dev -w backend",
     "backend:build": "npm run build -w backend",
+    "build": "npm run build -w frontend",
+    "vercel-build": "npm run build -w frontend",
     "install:all": "npm install"
   }
 }
