@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { FloatingChatButton } from '@/components/features/FloatingChatButton';
 import { AIChatAssistant } from '@/components/features/ai/AIChatAssistant';
 import '@/globals.css';
@@ -8,27 +8,12 @@ import AuthProvider from '@/components/providers/SessionProvider';
 
 const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'EduPlatform | AI-First Student Intelligence',
+  title: 'EAOverseas | Institutional Intelligence',
   description: 'Enterprise-grade global student intelligence and university discovery platform.',
-  openGraph: {
-    title: 'EduPlatform',
-    description: 'AI-First Student Intelligence',
-    url: 'https://eduplatform.example.com',
-    siteName: 'EduPlatform',
-    locale: 'en_US',
-    type: 'website',
-  },
 };
 
 export default function RootLayout({
@@ -37,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="antialiased selection:bg-brand-primary/20 selection:text-brand-primary">
+    <html lang="en">
+      <body className={`${inter.className} antialiased selection:bg-brand-primary/20 selection:text-brand-primary`}>
         <AuthProvider>
           <main>{children}</main>
         </AuthProvider>
@@ -50,12 +35,12 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'EduPlatform',
-              url: 'https://eduplatform.example.com',
-              logo: 'https://eduplatform.example.com/logo.png',
+              name: 'EAOverseas',
+              url: 'https://eaoverseas.com',
+              logo: 'https://eaoverseas.com/logo.png',
               sameAs: [
-                'https://twitter.com/eduplatform',
-                'https://linkedin.com/company/eduplatform',
+                'https://twitter.com/eaoverseas',
+                'https://linkedin.com/company/eaoverseas',
               ],
             }),
           }}

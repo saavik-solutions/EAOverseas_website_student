@@ -38,8 +38,8 @@ const config: Config = {
         hover: "0 8px 40px rgba(79,70,229,0.12)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
-        mono: ["var(--font-jetbrains-mono)", "monospace"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
       },
     },
   },
