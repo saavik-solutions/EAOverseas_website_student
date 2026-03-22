@@ -3,7 +3,7 @@ import connectToDatabase from '../lib/db/mongodb';
 import { User } from '../lib/db/models/User';
 import { Blog } from '../lib/db/models/Blog';
 import { Post } from '../lib/db/models/Post';
-import { Lead } from '../lib/db/models/Lead';
+import Lead from '../lib/db/models/Lead';
 import crypto from 'crypto';
 
 async function seedData() {
