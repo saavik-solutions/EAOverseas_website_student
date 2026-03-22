@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-primary: #4f46e5;
+  --brand-accent: #06b6d4;
+  --brand-success: #10b981;
+  --brand-warning: #f59e0b;
+  --brand-danger: #ef4444;
+  --bg-base: #f9fafb;
+  --bg-card: #ffffff;
+  --nav-bg: #1e1b4b;
+  --text-primary: #111827;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 8px 40px rgba(79, 70, 229, 0.12);
+}
+
+@layer base {
+  body {
+    @apply bg-bg-base text-text-primary font-sans;
+  }
+}
+
+@layer components {
+  .card-premium {
+    @apply bg-bg-card border border-border rounded-[var(--radius-card)] shadow-[var(--shadow-card)] transition-all duration-300 hover:shadow-[var(--shadow-hover)] hover:-translate-y-0.5;
+  }
+
+  .btn-primary {
+    @apply bg-brand-primary text-white rounded-[var(--radius-btn)] px-4 py-2 font-medium transition-all hover:opacity-90 active:scale-95;
+  }
+
+  .nav-sidebar {
+    @apply bg-nav-bg text-white w-60 h-screen fixed left-0 top-0 transition-all duration-300;
+  }
+}

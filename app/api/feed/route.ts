@@ -1,0 +1,67 @@
+import { NextResponse } from 'next/server';
+import connectToDatabase from '@/lib/db/mongodb';
+import { Post } from '@/lib/db/models/Post';
+import Notification from '@/lib/db/models/Notification';
+import { auth } from '@/lib/auth';
+
+export async function GET() {
+  try {
+    await connectToDatabase();
+    
+    // Fetch all posts, populate author details (but exclude sensitive fields)
+    const posts = await Post.find()
+      .populate('authorId', 'fullName avatarUrl role')
+      .populate('commentsList.userId', 'fullName avatarUrl')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return NextResponse.json({ posts }, { status: 200 });
+  } catch (error) {
+    console.error('Failed to fetch feed:', error);
+    return NextResponse.json({ error: 'Failed to fetch feed' }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const session = await auth();
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { content, title, category, tags, flair } = await req.json();
+
+    if (!content) {
+      return NextResponse.json({ error: 'Content is required' }, { status: 400 });
+    }
+
+    await connectToDatabase();
+
+    const newPost = await Post.create({
+      authorId: session.user.id,
+      authorName: session.user.name,
+      title: title || 'Community Discussion',
+      content,
+      category: category || 'general',
+      tags: tags || [],
+      flair: flair || 'Discussion',
+    });
+
+    const populatedPost = await Post.findById(newPost._id)
+      .populate('authorId', 'fullName avatarUrl role')
+      .lean();
+
+    // Create a broadcast notification for every new community post
+    await Notification.create({
+      type: 'info',
+      message: `New Community Post: "${title || 'Untitled'}" by ${session.user.name}`,
+      targetId: newPost._id.toString(),
+      targetType: 'post'
+    });
+
+    return NextResponse.json({ post: populatedPost }, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create post:', error);
+    return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
+  }
+}
