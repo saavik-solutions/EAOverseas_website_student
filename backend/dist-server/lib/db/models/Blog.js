@@ -46,6 +46,14 @@ const BlogSchema = new mongoose_1.Schema({
     readTime: { type: String, default: '5 min read' },
     views: { type: Number, default: 0 },
     clicks: { type: Number, default: 0 },
+    likes: { type: Number, default: 0 },
+    comments: [
+        {
+            user: { type: String, required: true },
+            content: { type: String, required: true },
+            createdAt: { type: Date, default: Date.now }
+        }
+    ],
     published: { type: Boolean, default: false },
     tags: [{ type: String }],
 }, { timestamps: true, collection: 'blogs' });

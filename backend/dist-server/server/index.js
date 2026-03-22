@@ -48,6 +48,45 @@ app.get('/api/v1/blogs', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch intelligence nodes' });
     }
 });
+app.get('/api/v1/blogs/:slug', async (req, res) => {
+    try {
+        const blog = await Blog_1.Blog.findOne({ slug: req.params.slug, published: true });
+        if (!blog)
+            return res.status(404).json({ error: 'Blog not found' });
+        res.json(blog);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to fetch intelligence node' });
+    }
+});
+app.patch('/api/v1/blogs/:slug/view', async (req, res) => {
+    try {
+        const blog = await Blog_1.Blog.findOneAndUpdate({ slug: req.params.slug }, { $inc: { views: 1 } }, { new: true });
+        res.json({ views: blog?.views });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to sync view count' });
+    }
+});
+app.post('/api/v1/blogs/:slug/like', async (req, res) => {
+    try {
+        const blog = await Blog_1.Blog.findOneAndUpdate({ slug: req.params.slug }, { $inc: { likes: 1 } }, { new: true });
+        res.json({ likes: blog?.likes });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to sync like' });
+    }
+});
+app.post('/api/v1/blogs/:slug/comment', async (req, res) => {
+    try {
+        const { user, content } = req.body;
+        const blog = await Blog_1.Blog.findOneAndUpdate({ slug: req.params.slug }, { $push: { comments: { user, content, createdAt: new Date() } } }, { new: true });
+        res.json({ comments: blog?.comments });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to publish comment' });
+    }
+});
 app.post('/api/v1/leads', async (req, res) => {
     try {
         const newLead = await Lead_1.default.create(req.body);
