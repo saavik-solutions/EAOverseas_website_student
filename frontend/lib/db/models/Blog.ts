@@ -11,6 +11,12 @@ export interface IBlog extends Document {
     readTime?: string; // e.g., "5 min read"
     views: number;
     clicks: number;
+    likes: number;
+    comments: Array<{
+        user: string;
+        content: string;
+        createdAt: Date;
+    }>;
     published: boolean;
     tags: string[];
     createdAt: Date;
@@ -29,6 +35,14 @@ const BlogSchema: Schema = new Schema(
         readTime: { type: String, default: '5 min read' },
         views: { type: Number, default: 0 },
         clicks: { type: Number, default: 0 },
+        likes: { type: Number, default: 0 },
+        comments: [
+            {
+                user: { type: String, required: true },
+                content: { type: String, required: true },
+                createdAt: { type: Date, default: Date.now }
+            }
+        ],
         published: { type: Boolean, default: false },
         tags: [{ type: String }],
     },
