@@ -23,11 +23,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         placeholder={placeholder}
         onChange={(e) => onSearch?.(e.target.value)}
       />
-      <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-        <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 border border-border rounded bg-bg-base text-[10px] font-medium text-text-muted">
-          ⌘K
-        </kbd>
-      </div>
     </div>
   );
 };
