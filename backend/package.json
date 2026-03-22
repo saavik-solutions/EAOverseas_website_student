@@ -1,0 +1,29 @@
+{
+  "name": "ea-overseas-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node server/index.ts",
+    "build": "tsc",
+    "start": "node dist-server/index.js",
+    "seed": "ts-node scripts/seed-production-data.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.2.3",
+    "mongodb": "^6.5.0",
+    "openai": "^4.31.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.3",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.11.30",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/morgan": "^1.9.9"
+  }
+}
