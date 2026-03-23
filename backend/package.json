@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ts-node server/index.ts",
     "build": "tsc",
-    "start": "node dist-server/index.js",
+    "start": "node dist-server/server/index.js",
     "seed": "ts-node scripts/seed-production-data.ts"
   },
   "dependencies": {
