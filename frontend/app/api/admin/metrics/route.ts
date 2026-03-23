@@ -20,7 +20,8 @@ export async function GET() {
     const newUsersLast30Days = await User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
 
     // 3. Social Broadcasts
-    const totalBroadcasts = await Post.countDocuments({ category: 'global' });
+    const totalBroadcasts = await Post.countDocuments({ isGlobal: true });
+    const totalCommunityPosts = await Post.countDocuments({ isGlobal: false });
 
     // 4. Active Students
     const activeStudents = await User.countDocuments({ role: 'student' });
@@ -38,9 +39,7 @@ export async function GET() {
 
     return NextResponse.json({
       totalUsers,
-      totalBlogs: publishedBlogs + draftBlogs,
-      publishedBlogs,
-      draftBlogs,
+      totalCommunityPosts,
       totalPosts: totalBroadcasts,
       userGrowth: newUsersLast30Days,
       activeStudents,

@@ -28,10 +28,20 @@ export async function PATCH(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const { postId } = await req.json();
+    const { postId, commentId } = await req.json();
     await connectToDatabase();
+    
+    if (commentId) {
+      // Neutralize specific comment node
+      await Post.findByIdAndUpdate(postId, {
+        $pull: { commentsList: { _id: commentId } }
+      });
+      return NextResponse.json({ success: true, message: 'Comment neutralized' }, { status: 200 });
+    }
+
+    // Terminate entire post node
     await Post.findByIdAndDelete(postId);
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true, message: 'Post terminated' }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }

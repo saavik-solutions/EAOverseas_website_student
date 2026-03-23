@@ -22,18 +22,25 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { label: 'Intelligence Feed', href: '/admin/broadcast', icon: Radio },
-  { label: 'Community Governance', href: '/admin/community', icon: MessageSquare },
-  { label: 'Lead Vault', href: '/admin/leads', icon: Database },
-  { label: 'Student Directory', href: '/admin/students', icon: Users },
-  { label: 'Blog CMS', href: '/admin/blogs', icon: FileText },
-];
-
 export const AdminLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const NAV_ITEMS = [
+    { label: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
+    { label: 'Global Feed Hub', href: '/admin/broadcast', icon: 'Radio' },
+    { label: 'Community Governance', href: '/admin/community', icon: 'MessageSquare' },
+    { label: 'User Control', href: '/admin/students', icon: 'Users' },
+    { label: 'Notifications', href: '/admin/notifications', icon: 'Bell' },
+  ];
+
+  const iconMap: Record<string, any> = {
+    LayoutDashboard,
+    Radio,
+    MessageSquare,
+    Users,
+    Bell
+  };
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-slate-800 font-sans overflow-hidden">
@@ -53,6 +60,7 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
         <nav className="flex-1 py-8 overflow-y-auto space-y-1 px-4 custom-scrollbar">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+            const Icon = iconMap[item.icon];
             return (
               <Link 
                 key={item.href} 
@@ -63,7 +71,7 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
                     : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                <item.icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                {Icon && <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />}
                 {item.label}
               </Link>
             )

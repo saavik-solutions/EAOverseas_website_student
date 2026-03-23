@@ -10,7 +10,10 @@ import {
   TrendingUp,
   CheckCircle2,
   AlertCircle,
-  Loader2
+  Loader2,
+  MessageSquare,
+  MoreVertical,
+  Calendar
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -37,36 +40,36 @@ export default function AdminDashboard() {
 
   const stats = [
     { 
-      label: 'Active Students', 
+      label: 'Active Users', 
       value: metrics?.totalUsers || '0', 
       trend: metrics?.userGrowth > 0 ? `+${metrics.userGrowth}` : '0', 
       icon: Users, 
       color: 'bg-indigo-500', 
-      desc: 'Registered this month' 
-    },
-    { 
-      label: 'Blog Repository', 
-      value: metrics?.totalBlogs || '0', 
-      trend: `${metrics?.publishedBlogs || 0} Live`, 
-      icon: FileText, 
-      color: 'bg-emerald-500', 
-      desc: `${metrics?.draftBlogs || 0} in drafts` 
+      desc: 'Institutional accounts' 
     },
     { 
       label: 'Feed Signals', 
       value: metrics?.totalPosts || '0', 
-      trend: 'Real-time', 
+      trend: 'Universal', 
       icon: Radio, 
       color: 'bg-amber-500', 
-      desc: 'Database synchronized' 
+      desc: 'Global announcements' 
     },
     { 
-      label: 'Network Health', 
-      value: '99.9%', 
-      trend: 'Active', 
+      label: 'Community Engagement', 
+      value: metrics?.totalCommunityPosts || '0', 
+      trend: 'Live Monitoring', 
+      icon: MessageSquare, 
+      color: 'bg-emerald-500', 
+      desc: 'User-generated posts' 
+    },
+    { 
+      label: 'Network Status', 
+      value: 'OPERATIONAL', 
+      trend: '99.9%', 
       icon: Activity, 
       color: 'bg-rose-500', 
-      desc: 'All systems operational' 
+      desc: 'Security node active' 
     },
   ];
 
@@ -194,10 +197,4 @@ export default function AdminDashboard() {
   );
 }
 
-// Additional icons
-function Calendar({ className }: { className?: string }) {
-  return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>;
-}
-function MoreVertical({ className }: { className?: string }) {
-  return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>;
-}
+// Additional icons removed - using Lucide React originals for institutional stability.

@@ -64,6 +64,22 @@ export default function CommunityGovernancePage() {
     }
   };
 
+  const deleteComment = async (postId: string, commentId: string) => {
+    if (!confirm('Operational Security: Neutralize this comment node?')) return;
+    try {
+      await fetch('/api/admin/community', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId, commentId })
+      });
+      fetchPosts();
+    } catch (err) {
+      alert('Neutralization Failed.');
+    }
+  };
+
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   const filteredPosts = posts.filter(p => 
     p.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     p.authorName?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -122,11 +138,18 @@ export default function CommunityGovernancePage() {
                    <td colSpan={6} className="py-24 text-center text-sm font-semibold text-slate-400">No community records detected in system.</td>
                 </tr>
               ) : filteredPosts.map((post) => (
-                <tr key={post._id} className="hover:bg-slate-50/50 transition-all group">
+                <React.Fragment key={post._id}>
+                <tr className="hover:bg-slate-50/50 transition-all group">
                   <td className="px-8 py-5">
                      <div className="space-y-1">
                         <p className="text-sm font-bold text-slate-900 group-hover:text-slate-600 transition-colors">{post.title || 'Institutional Thread'}</p>
                         <p className="text-xs text-slate-500 truncate max-w-[250px]">{post.content?.substring(0, 60)}...</p>
+                        <button 
+                          onClick={() => setExpandedId(expandedId === post._id ? null : post._id)}
+                          className="text-[10px] font-bold text-brand-primary uppercase tracking-tighter hover:underline"
+                        >
+                          {post.commentsList?.length || 0} Comments (Audit)
+                        </button>
                      </div>
                   </td>
                   <td className="px-8 py-5">
@@ -178,6 +201,32 @@ export default function CommunityGovernancePage() {
                      </div>
                   </td>
                 </tr>
+                {expandedId === post._id && post.commentsList?.length > 0 && (
+                  <tr className="bg-slate-50/50">
+                    <td colSpan={6} className="px-12 py-6">
+                      <div className="space-y-4">
+                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Thread Audit Dashboard</h4>
+                        {post.commentsList.map((comment: any) => (
+                          <div key={comment._id} className="flex items-start justify-between p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
+                            <div className="space-y-1">
+                              <p className="text-xs font-bold text-slate-900 leading-relaxed">{comment.text}</p>
+                              <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2 italic">
+                                — Anonymous Student · {new Date(comment.createdAt).toLocaleTimeString()}
+                              </p>
+                            </div>
+                            <button 
+                              onClick={() => deleteComment(post._id, comment._id)}
+                              className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
