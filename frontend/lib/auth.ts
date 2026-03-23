@@ -15,13 +15,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         if (credentials?.isAnonymous === 'true') {
-          // Instantly generate a stateless ephemeral session without calling the DB
+          await connectToDatabase();
+          const uniqueHash = Date.now().toString() + Math.random().toString().substring(2, 6);
+          const email = `anon_${uniqueHash}@anonymous.local`;
+          const passwordHash = await bcrypt.hash(uniqueHash, 10);
+          
+          const newUser = await User.create({
+            fullName: "Anonymous Student",
+            email: email,
+            passwordHash: passwordHash,
+            role: "student",
+            onboardingCompleted: true
+          });
+
           return {
-            id: `guest_${Date.now()}`,
-            email: `guest_${Date.now()}@anonymous.local`,
-            name: "Anonymous User",
-            role: "guest",
-            onboardingCompleted: true, // Auto-bypass the Waitlist Gate
+            id: newUser._id.toString(),
+            email: newUser.email,
+            name: newUser.fullName,
+            role: newUser.role,
+            onboardingCompleted: newUser.onboardingCompleted,
           };
         }
 

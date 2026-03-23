@@ -5,16 +5,50 @@ import React from 'react';
 import { CommunityCategorySidebar } from './CommunityCategorySidebar';
 import { CommunityPost, CommunityFlair } from './CommunityPost';
 import { CommunitySidebar } from './CommunitySidebar';
-import { NewPostModal } from './NewPostModal';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export const CommunityFeed: React.FC = () => {
-  const [isModalOpen, setModalOpen] = React.useState(false);
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = React.useState(true);
   const [posts, setPosts] = React.useState<any[]>([]);
   const searchParams = useSearchParams();
   const highlightedId = searchParams.get('highlight');
+  
+  // Inline Composer State
+  const [isComposing, setIsComposing] = React.useState(false);
+  const [newTitle, setNewTitle] = React.useState('');
+  const [newContent, setNewContent] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handlePostSubmit = async () => {
+    if (!newContent.trim()) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/feed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newTitle || 'Community Discussion',
+          content: newContent,
+          category: 'general',
+          flair: 'Discussion'
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPosts([data.post, ...posts]);
+        setNewTitle('');
+        setNewContent('');
+        setIsComposing(false);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   React.useEffect(() => {
     const fetchPosts = async () => {
@@ -60,17 +94,52 @@ export const CommunityFeed: React.FC = () => {
 
       {/* Main Feed */}
       <main className="lg:col-span-9 xl:col-span-7 space-y-6">
-        <div 
-          onClick={() => setModalOpen(true)}
-          className="bg-white p-4 rounded-2xl border border-border flex items-center gap-4 mb-8 cursor-pointer hover:border-brand-primary transition-colors"
-        >
-          <div className="w-10 h-10 rounded-full bg-nav-bg flex items-center justify-center text-white font-black text-xs">
-            JD
+        {isComposing ? (
+          <div className="bg-white p-6 rounded-2xl border border-border shadow-sm mb-8 space-y-4 transition-all">
+             <input 
+                type="text" 
+                placeholder="Discussion Title (Optional)" 
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                className="w-full text-lg font-bold text-text-primary placeholder:text-text-muted/50 border-none outline-none focus:ring-0 px-0 bg-transparent"
+             />
+             <textarea 
+                placeholder="What's on your mind? Share an experience, ask a question..." 
+                value={newContent}
+                onChange={(e) => setNewContent(e.target.value)}
+                autoFocus
+                className="w-full min-h-[120px] text-sm text-text-primary placeholder:text-text-muted border-none outline-none focus:ring-0 px-0 bg-transparent resize-y custom-scrollbar"
+             />
+             <div className="flex items-center justify-end gap-3 pt-4 border-t border-border mt-4">
+                <button 
+                  onClick={() => setIsComposing(false)}
+                  className="px-4 py-2 text-sm font-bold text-text-muted hover:text-text-primary transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handlePostSubmit}
+                  disabled={!newContent.trim() || isSubmitting}
+                  className="btn-primary px-6 py-2 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSubmitting ? <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : null}
+                  Post
+                </button>
+             </div>
           </div>
-          <div className="flex-1 bg-bg-base rounded-xl px-4 py-2.5 text-sm font-medium text-text-muted">
-            Create a post...
+        ) : (
+          <div 
+            onClick={() => setIsComposing(true)}
+            className="bg-white p-4 rounded-2xl border border-border flex items-center gap-4 mb-8 cursor-pointer hover:border-brand-primary transition-colors shadow-sm"
+          >
+            <div className="w-10 h-10 rounded-full bg-nav-bg flex items-center justify-center text-white font-black text-xs shrink-0">
+              {session?.user?.name ? session.user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'AS'}
+            </div>
+            <div className="flex-1 bg-bg-base/70 rounded-full px-5 py-3 text-sm font-medium text-text-muted">
+              Create a post...
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           {posts.length === 0 ? (
@@ -83,7 +152,7 @@ export const CommunityFeed: React.FC = () => {
                 Be the first to start a conversation! Ask a question, share an experience, or post a review.
               </p>
               <button 
-                onClick={() => setModalOpen(true)}
+                onClick={() => setIsComposing(true)}
                 className="btn-primary px-6 py-2.5 rounded-xl font-bold text-sm mx-auto block"
               >
                 Start a Discussion
@@ -116,7 +185,7 @@ export const CommunityFeed: React.FC = () => {
         <CommunitySidebar />
       </aside>
 
-      <NewPostModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+
     </div>
   );
 };
