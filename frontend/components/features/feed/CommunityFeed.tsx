@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 export const CommunityFeed: React.FC = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = React.useState(true);
   const [posts, setPosts] = React.useState<any[]>([]);
   const searchParams = useSearchParams();
@@ -26,6 +26,14 @@ export const CommunityFeed: React.FC = () => {
     if (!newContent.trim()) return;
     setIsSubmitting(true);
     try {
+      // 1. Frictionless Anonymous Authentication
+      if (status === 'unauthenticated') {
+         await import('next-auth/react').then(mod => mod.signIn('credentials', { isAnonymous: 'true', redirect: false }));
+         // Slight delay to ensure the session cookie is correctly registered by the network layer
+         await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      // 2. Deploy the Post
       const res = await fetch('/api/feed', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,15 +44,21 @@ export const CommunityFeed: React.FC = () => {
           flair: 'Discussion'
         })
       });
+      
       if (res.ok) {
         const data = await res.json();
         setPosts([data.post, ...posts]);
         setNewTitle('');
         setNewContent('');
         setIsComposing(false);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Institutional node rejected the payload:", errData);
+        alert(errData.error || "Failed to publish post. Please check your network connection.");
       }
     } catch (error) {
       console.error(error);
+      alert("Network anomaly detected. Post deployment failed.");
     } finally {
       setIsSubmitting(false);
     }
@@ -120,10 +134,9 @@ export const CommunityFeed: React.FC = () => {
                 <button 
                   onClick={handlePostSubmit}
                   disabled={!newContent.trim() || isSubmitting}
-                  className="btn-primary px-6 py-2 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2"
+                  className="btn-primary px-6 py-2 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center justify-center min-w-[100px] transition-all"
                 >
-                  {isSubmitting ? <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : null}
-                  Post
+                  {isSubmitting ? 'Posting...' : 'Post'}
                 </button>
              </div>
           </div>
