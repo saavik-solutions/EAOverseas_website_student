@@ -1,8 +1,10 @@
-node_modules
+dist-server
+dist-server-frontend
 .next
 out
 build
 dist
+node_modules
 .env
 .env.local
 .env.development.local
