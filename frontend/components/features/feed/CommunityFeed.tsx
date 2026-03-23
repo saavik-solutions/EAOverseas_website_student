@@ -13,6 +13,7 @@ export const CommunityFeed: React.FC = () => {
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = React.useState(true);
   const [posts, setPosts] = React.useState<any[]>([]);
+  const [stats, setStats] = React.useState<any>(null);
   const searchParams = useSearchParams();
   const highlightedId = searchParams.get('highlight');
   
@@ -64,6 +65,7 @@ export const CommunityFeed: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           setPosts(data.posts || []);
+          setStats(data.stats || null);
         }
       } catch (error) {
         console.error("Failed to fetch posts:", error);
@@ -188,7 +190,7 @@ export const CommunityFeed: React.FC = () => {
 
       {/* Community Stats Sidebar */}
       <aside className="hidden xl:block xl:col-span-3">
-        <CommunitySidebar />
+        <CommunitySidebar statsData={stats} />
       </aside>
 
 

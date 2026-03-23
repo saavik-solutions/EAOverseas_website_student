@@ -4,10 +4,14 @@ import React from 'react';
 import { Trophy, ShieldCheck, Users, UserCircle } from 'lucide-react';
 import Link from 'next/link';
 
-export const CommunitySidebar: React.FC = () => {
+export const CommunitySidebar: React.FC<{ statsData?: any }> = ({ statsData }) => {
+  const formattedTotalPosts = statsData?.totalPosts !== undefined 
+    ? (statsData.totalPosts > 999 ? (statsData.totalPosts / 1000).toFixed(1) + 'k' : statsData.totalPosts.toString())
+    : '...';
+
   const stats = [
-    { label: 'Total Members', value: '42.1k', icon: Users },
-    { label: 'Online Now', value: '1.2k', icon: Users },
+    { label: 'Total Posts', value: formattedTotalPosts, icon: Users },
+    { label: 'Online Now', value: statsData?.onlineNow?.toString() || '...', icon: Users },
   ];
 
   const rules = [
@@ -18,7 +22,7 @@ export const CommunitySidebar: React.FC = () => {
     "Search before asking questions"
   ];
 
-  const topContributors = [
+  const topContributors = statsData?.topContributors || [
     { name: "alex_visa_expert", posts: 142 },
     { name: "sarah_london", posts: 98 },
     { name: "mike_studies_ca", posts: 74 }
@@ -62,13 +66,15 @@ export const CommunitySidebar: React.FC = () => {
            <h4 className="font-black text-xs uppercase tracking-widest text-text-primary">Top Contributors</h4>
          </div>
          <div className="space-y-5">
-           {topContributors.map((c, idx) => (
+           {topContributors.map((c: any, idx: number) => (
              <div key={idx} className="flex items-center justify-between">
                <div className="flex items-center gap-3">
                  <div className="w-8 h-8 rounded-full bg-nav-bg border border-border flex items-center justify-center text-[10px] font-black text-white">
-                   {c.name[0].toUpperCase()}
+                   {c.name ? c.name[0].toUpperCase() : 'A'}
                  </div>
-                 <span className="text-xs font-bold text-text-primary">u/{c.name}</span>
+                 <span className="text-xs font-bold text-text-primary">
+                    {c.name === 'Anonymous Student' ? 'Anonymous Student' : `u/${c.name}`}
+                 </span>
                </div>
                <span className="text-[10px] font-black text-brand-primary bg-brand-primary/5 px-2 py-1 rounded-lg">
                  {c.posts} pts

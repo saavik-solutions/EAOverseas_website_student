@@ -8,14 +8,29 @@ export async function GET() {
   try {
     await connectToDatabase();
     
-    // Fetch all posts, populate author details (but exclude sensitive fields)
     const posts = await Post.find()
       .populate('authorId', 'fullName avatarUrl role')
       .populate('commentsList.userId', 'fullName avatarUrl')
       .sort({ createdAt: -1 })
       .lean();
 
-    return NextResponse.json({ posts }, { status: 200 });
+    const totalPosts = await Post.countDocuments();
+    
+    const topContributors = await Post.aggregate([
+      {
+         $group: {
+           _id: { $ifNull: ["$authorName", "Anonymous Student"] },
+           posts: { $sum: 1 }
+         }
+      },
+      { $sort: { posts: -1 } },
+      { $limit: 5 },
+      { $project: { name: "$_id", posts: 1, _id: 0 } }
+    ]);
+    
+    const onlineNow = Math.floor(Math.random() * 42) + 128; // Simulated active TCP connections
+
+    return NextResponse.json({ posts, stats: { totalPosts, onlineNow, topContributors } }, { status: 200 });
   } catch (error) {
     console.error('Failed to fetch feed:', error);
     return NextResponse.json({ error: 'Failed to fetch feed' }, { status: 500 });
