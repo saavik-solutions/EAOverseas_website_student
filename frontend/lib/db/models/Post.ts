@@ -49,7 +49,7 @@ const CommentSchema = new Schema<IComment>({
 
 const PostSchema: Schema = new Schema(
     {
-        authorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        authorId: { type: Schema.Types.ObjectId, ref: 'User' },
         authorName: { type: String, required: true },
         authorAvatar: { type: String },
         title: { type: String, required: true },

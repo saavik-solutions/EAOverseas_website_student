@@ -25,9 +25,6 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const { content, title, category, tags, flair } = await req.json();
 
@@ -37,15 +34,21 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
 
-    const newPost = await Post.create({
-      authorId: session.user.id,
-      authorName: session.user.name,
+    const authorNameFallback = 'Anonymous Student';
+    const postPayload: any = {
+      authorName: session?.user?.name || authorNameFallback,
       title: title || 'Community Discussion',
       content,
       category: category || 'general',
       tags: tags || [],
       flair: flair || 'Discussion',
-    });
+    };
+
+    if (session?.user?.id) {
+      postPayload.authorId = session.user.id;
+    }
+
+    const newPost = await Post.create(postPayload);
 
     const populatedPost = await Post.findById(newPost._id)
       .populate('authorId', 'fullName avatarUrl role')
@@ -54,7 +57,7 @@ export async function POST(req: Request) {
     // Create a broadcast notification for every new community post
     await Notification.create({
       type: 'info',
-      message: `New Community Post: "${title || 'Untitled'}" by ${session.user.name}`,
+      message: `New Community Post: "${title || 'Untitled'}" by ${session?.user?.name || authorNameFallback}`,
       targetId: newPost._id.toString(),
       targetType: 'post'
     });

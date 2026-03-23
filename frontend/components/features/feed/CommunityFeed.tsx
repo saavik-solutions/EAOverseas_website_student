@@ -26,14 +26,7 @@ export const CommunityFeed: React.FC = () => {
     if (!newContent.trim()) return;
     setIsSubmitting(true);
     try {
-      // 1. Frictionless Anonymous Authentication
-      if (status === 'unauthenticated') {
-         await import('next-auth/react').then(mod => mod.signIn('credentials', { isAnonymous: 'true', redirect: false }));
-         // Slight delay to ensure the session cookie is correctly registered by the network layer
-         await new Promise(resolve => setTimeout(resolve, 500));
-      }
-
-      // 2. Deploy the Post
+      // Deploy the Post directly, completely bypassing authentication requirements
       const res = await fetch('/api/feed', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
