@@ -4,23 +4,17 @@ import React, { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  LayoutDashboard, 
-  FileText, 
-  Radio, 
-  Users, 
-  Database,
-  Search,
   ChevronRight,
   LogOut,
   Bell,
   HelpCircle,
   Menu,
-  ChevronDown,
   Globe,
-  MessageSquare,
+  Search,
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DynamicIcon } from '@/components/ui/DynamicIcon';
 
 export const AdminLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
@@ -33,14 +27,6 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
     { label: 'User Control', href: '/admin/students', icon: 'Users' },
     { label: 'Notifications', href: '/admin/notifications', icon: 'Bell' },
   ];
-
-  const iconMap: Record<string, any> = {
-    LayoutDashboard,
-    Radio,
-    MessageSquare,
-    Users,
-    Bell
-  };
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-slate-800 font-sans overflow-hidden">
@@ -60,7 +46,6 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
         <nav className="flex-1 py-8 overflow-y-auto space-y-1 px-4 custom-scrollbar">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
-            const Icon = iconMap[item.icon];
             return (
               <Link 
                 key={item.href} 
@@ -71,7 +56,10 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
                     : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                {Icon && <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />}
+                <DynamicIcon 
+                   name={item.icon} 
+                   className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-slate-400'}`} 
+                />
                 {item.label}
               </Link>
             )
@@ -172,13 +160,13 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
                   <p className="mt-2 text-[10px] font-bold text-brand-primary">2 minutes ago</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 opacity-60">
-                  <p className="text-xs font-bold text-slate-900 mb-1">Zero-Auth Active</p>
-                  <p className="text-[10px] text-slate-500 leading-relaxed">Administrative session validation deactivated as per institutional request.</p>
-                  <p className="mt-2 text-[10px] font-bold text-slate-400">1 hour ago</p>
+                   <p className="text-xs font-bold text-slate-900 mb-1">Zero-Auth Active</p>
+                   <p className="text-[10px] text-slate-500 leading-relaxed">Administrative session validation deactivated as per institutional request.</p>
+                   <p className="mt-2 text-[10px] font-bold text-slate-400">1 hour ago</p>
                 </div>
               </div>
               <div className="p-4 border-t border-slate-100 flex justify-center">
-                <button className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all">Clear All History</button>
+                 <button className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all">Clear All History</button>
               </div>
             </motion.div>
           )}

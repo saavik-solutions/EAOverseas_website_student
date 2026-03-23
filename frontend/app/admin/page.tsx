@@ -2,20 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { 
-  Users, 
-  FileText, 
-  Radio, 
-  Activity, 
   ArrowUpRight,
   TrendingUp,
   CheckCircle2,
   AlertCircle,
   Loader2,
-  MessageSquare,
-  MoreVertical,
-  Calendar
+  Calendar,
+  MoreVertical
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { DynamicIcon } from '@/components/ui/DynamicIcon';
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<any>(null);
@@ -43,7 +39,7 @@ export default function AdminDashboard() {
       label: 'Active Users', 
       value: metrics?.totalUsers || '0', 
       trend: metrics?.userGrowth > 0 ? `+${metrics.userGrowth}` : '0', 
-      icon: Users, 
+      icon: 'Users', 
       color: 'bg-indigo-500', 
       desc: 'Institutional accounts' 
     },
@@ -51,7 +47,7 @@ export default function AdminDashboard() {
       label: 'Feed Signals', 
       value: metrics?.totalPosts || '0', 
       trend: 'Universal', 
-      icon: Radio, 
+      icon: 'Radio', 
       color: 'bg-amber-500', 
       desc: 'Global announcements' 
     },
@@ -59,7 +55,7 @@ export default function AdminDashboard() {
       label: 'Community Engagement', 
       value: metrics?.totalCommunityPosts || '0', 
       trend: 'Live Monitoring', 
-      icon: MessageSquare, 
+      icon: 'MessageSquare', 
       color: 'bg-emerald-500', 
       desc: 'User-generated posts' 
     },
@@ -67,7 +63,7 @@ export default function AdminDashboard() {
       label: 'Network Status', 
       value: 'OPERATIONAL', 
       trend: '99.9%', 
-      icon: Activity, 
+      icon: 'Activity', 
       color: 'bg-rose-500', 
       desc: 'Security node active' 
     },
@@ -108,7 +104,7 @@ export default function AdminDashboard() {
           >
             <div className="flex items-start justify-between mb-4">
               <div className={`p-2.5 rounded-xl ${stat.color} text-white shadow-lg shadow-${stat.color.split('-')[1]}-200`}>
-                <stat.icon className="h-5 w-5" />
+                <DynamicIcon name={stat.icon} className="h-5 w-5" />
               </div>
               <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 uppercase tracking-widest">
                 {stat.trend}
@@ -196,5 +192,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-// Additional icons removed - using Lucide React originals for institutional stability.
