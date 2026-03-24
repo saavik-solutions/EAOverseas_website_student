@@ -21,6 +21,7 @@ export interface IPost extends Document {
     authorAvatar?: string;
     title: string;
     content: string;
+    imageUrl?: string;
     category: string;
     tags: string[];
     upvotes: mongoose.Schema.Types.ObjectId[];
@@ -54,6 +55,7 @@ const PostSchema: Schema = new Schema(
         authorAvatar: { type: String },
         title: { type: String, required: true },
         content: { type: String, required: true },
+        imageUrl: { type: String },
         category: { type: String, default: 'general' },
         tags: [{ type: String }],
         upvotes: [{ type: Schema.Types.ObjectId, ref: 'User' }],

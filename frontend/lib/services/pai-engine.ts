@@ -6,6 +6,7 @@ export interface ProfileData {
   experience: Array<{ role: string; company: string; years: number }>;
   skills: string[];
   budget: number;
+  resumeText?: string;
 }
 
 export interface PAIResult {
@@ -99,11 +100,15 @@ export class PAIEngine {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     
     // We use a highly structured prompt to get reliable JSON back in one token-efficient call
-    const prompt = `Analyze this student profile for global education:
+    let prompt = `Analyze this student profile for global education:
     Profile: ${JSON.stringify(profile)}
-    Scores: ${JSON.stringify(scores)}
+    Scores: ${JSON.stringify(scores)}`;
     
-    Return JSON format: 
+    if (profile.resumeText) {
+      prompt += `\nRaw Resume Data Extracted: """\n${profile.resumeText}\n"""\nUse this raw resume data to identify actual career depth, projects, and highly specific strengths.`;
+    }
+
+    prompt += `\n\nReturn JSON format: 
     {
       "strengths": ["string", 5 items],
       "gaps": ["string", 5 items],

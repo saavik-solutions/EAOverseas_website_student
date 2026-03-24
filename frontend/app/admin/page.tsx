@@ -40,7 +40,7 @@ export default function AdminDashboard() {
       value: metrics?.totalUsers || '0', 
       trend: metrics?.userGrowth > 0 ? `+${metrics.userGrowth}` : '0', 
       icon: 'Users', 
-      color: 'bg-indigo-500', 
+      color: 'bg-brand-primary', 
       desc: 'Institutional accounts' 
     },
     { 

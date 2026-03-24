@@ -3,26 +3,31 @@
 @tailwind utilities;
 
 :root {
-  --brand-primary: #4f46e5;
-  --brand-accent: #06b6d4;
+  --brand-primary: #7c3aed;
+  --brand-accent: #d946ef;
   --brand-success: #10b981;
   --brand-warning: #f59e0b;
   --brand-danger: #ef4444;
   --bg-base: #f9fafb;
   --bg-card: #ffffff;
-  --nav-bg: #1e1b4b;
+  --nav-bg: #2e1065;
   --text-primary: #111827;
   --text-muted: #6b7280;
   --border-color: #e5e7eb;
-  --radius-card: 12px;
-  --radius-btn: 8px;
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 8px 40px rgba(79, 70, 229, 0.12);
+  --radius-card: 16px;
+  --radius-btn: 10px;
+  --shadow-card: 0 10px 30px -5px rgba(124, 58, 237, 0.05), inset 0 1px 0 rgba(255,255,255,0.7);
+  --shadow-hover: 0 24px 48px -12px rgba(124, 58, 237, 0.15);
 }
 
 @layer base {
   body {
     @apply bg-bg-base text-text-primary font-sans;
+    background-color: var(--bg-base);
+    background-image: linear-gradient(to right, rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-attachment: fixed;
   }
 }
 

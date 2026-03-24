@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
-import { ArrowBigUp, ArrowBigDown, MessageSquare, Share2, MoreHorizontal } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Heart, MessageSquare, Share2, Twitter, Linkedin, Facebook, Link as LinkIcon, CheckCircle2, Languages, Loader2, MessageCircle, Send, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export type CommunityFlair = 'Question' | 'Experience' | 'Tips' | 'Visa' | 'Finance' | 'General';
 
@@ -24,13 +25,27 @@ interface CommunityPostProps {
 }
 
 const flairStyles: Record<CommunityFlair, string> = {
-  Question: 'bg-blue-50 text-blue-600',
-  Experience: 'bg-purple-50 text-purple-600',
-  Tips: 'bg-green-50 text-green-600',
-  Visa: 'bg-red-50 text-red-600',
-  Finance: 'bg-orange-50 text-orange-600',
-  General: 'bg-gray-50 text-gray-600',
+  Question: 'bg-blue-50 text-blue-600 border border-blue-100',
+  Experience: 'bg-purple-50 text-purple-600 border border-purple-100',
+  Tips: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
+  Visa: 'bg-rose-50 text-rose-600 border border-rose-100',
+  Finance: 'bg-amber-50 text-amber-600 border border-amber-100',
+  General: 'bg-slate-50 text-slate-600 border border-slate-100',
 };
+
+const TRANSLATION_LANGUAGES = [
+  { code: 'Original', name: 'Original' },
+  { code: 'en', name: 'English' },
+  { code: 'zh-CN', name: 'Mandarin' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'fr', name: 'French' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'bn', name: 'Bengali' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'id', name: 'Indonesian' }
+];
 
 // Animation Variants for Highlighting
 const highlightVariants = {
@@ -58,12 +73,39 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
   tags = [],
   flair = 'General',
   userVote: initialVote = null,
+  isDetailedView = false,
   isHighlighted = false,
 }) => {
   const postRef = React.useRef<HTMLDivElement>(null);
   const [vote, setVote] = useState<'up' | 'down' | null>(initialVote);
   const [upvotes, setUpvotes] = useState(initialUpvotes);
   const [isCopied, setIsCopied] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const shareMenuRef = React.useRef<HTMLDivElement>(null);
+  
+  const [targetLang, setTargetLang] = useState('Original');
+  const [translatedTitle, setTranslatedTitle] = useState(title);
+  const [translatedContent, setTranslatedContent] = useState(content);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const langMenuRef = React.useRef<HTMLDivElement>(null);
+
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [localComments, setLocalComments] = useState<any[]>([]);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) setShowLangMenu(false);
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) setShowShareMenu(false);
+    };
+    if (showShareMenu || showLangMenu) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showShareMenu, showLangMenu]);
 
   React.useEffect(() => {
     if (isHighlighted && postRef.current) {
@@ -73,40 +115,129 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
     }
   }, [isHighlighted]);
 
-  const handleShare = async (e: React.MouseEvent) => {
+  const handleTranslate = async (langCode: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Dynamically construct absolute URI for deep linking to the detailed layout
-    const url = `${window.location.origin}/feed/community/${id}`;
-    
+    setTargetLang(langCode);
+    setShowLangMenu(false);
+    if (langCode === 'Original') {
+      setTranslatedTitle(title);
+      setTranslatedContent(content);
+      return;
+    }
+
+    setIsTranslating(true);
     try {
-      await navigator.clipboard.writeText(url);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      const [titleRes, contentRes] = await Promise.all([
+        fetch('/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: title, targetLanguage: langCode }) }),
+        fetch('/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: content, targetLanguage: langCode }) })
+      ]);
+      if (titleRes.ok && contentRes.ok) {
+        const titleData = await titleRes.json();
+        const contentData = await contentRes.json();
+        setTranslatedTitle(titleData.translatedText || title);
+        setTranslatedContent(contentData.translatedText || content);
+      }
     } catch (err) {
-      console.error('Failed to copy to clipboard', err);
+      console.error('Translation failed', err);
+    } finally {
+      setIsTranslating(false);
     }
   };
 
+  const handleCopyLink = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.origin}/feed/community/${id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setIsCopied(true);
+      setTimeout(() => { setIsCopied(false); setShowShareMenu(false); }, 2000);
+    } catch (err) {
+      console.error('Failed to copy', err);
+    }
+  };
+
+  const shareToSocial = (platform: 'twitter' | 'linkedin' | 'facebook' | 'whatsapp' | 'telegram', e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = encodeURIComponent(`${window.location.origin}/feed/community/${id}`);
+    const encodedTitle = encodeURIComponent(title);
+    
+    let shareUrl = '';
+    if (platform === 'twitter') shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${encodedTitle}`;
+    if (platform === 'linkedin') shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${encodedTitle}`;
+    if (platform === 'facebook') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    if (platform === 'whatsapp') shareUrl = `https://wa.me/?text=${encodedTitle}%20${url}`;
+    if (platform === 'telegram') shareUrl = `https://t.me/share/url?url=${url}&text=${encodedTitle}`;
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+    setShowShareMenu(false);
+  };
+
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim() || isSubmittingComment) return;
+
+    setIsSubmittingComment(true);
+    try {
+      const res = await fetch(`/api/feed/${id}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'comment', text: commentText })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLocalComments(data.post.commentsList || []);
+        setCommentText('');
+      }
+    } catch (err) {
+      console.error("Failed to add comment", err);
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showComments && localComments.length === 0) {
+      const fetchComments = async () => {
+        try {
+          const res = await fetch(`/api/feed/${id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setLocalComments(data.post.commentsList || []);
+          }
+        } catch (err) {
+          console.error("Failed to fetch comments", err);
+        }
+      };
+      fetchComments();
+    }
+  }, [showComments, id]);
+
   const handleVote = async (type: 'up' | 'down', e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     if (type === 'down') return; // Database currently only supports 'up' toggle
     
-    // Optimistic UI
     const isLiking = vote !== 'up';
     setVote(isLiking ? 'up' : null);
     setUpvotes(isLiking ? upvotes + 1 : upvotes - 1);
 
     try {
-      await fetch(`/api/feed/${id}/action`, {
+      const res = await fetch(`/api/feed/${id}/action`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'like' })
       });
+      if (!res.ok) {
+        setVote(!isLiking ? 'up' : null);
+        setUpvotes(!isLiking ? upvotes + 1 : upvotes - 1);
+        const data = await res.json().catch(() => ({}));
+        console.error("Action rejected:", data.error);
+      }
     } catch (err) {
       console.error(err);
-      // Revert on error
       setVote(!isLiking ? 'up' : null);
       setUpvotes(!isLiking ? upvotes + 1 : upvotes - 1);
     }
@@ -134,63 +265,69 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
     return `${Math.floor(diff / 86400)}d ago`;
   }, [createdAt]);
 
+  const getInitialAvatar = (name: string) => {
+    const firstLetter = name.trim().charAt(0).toUpperCase() || '?';
+    const bgColors = ['bg-rose-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500', 'bg-brand-primary'];
+    const colorIndex = name.length % bgColors.length;
+    return (
+      <div className={`w-8 h-8 rounded-full ${bgColors[colorIndex]} flex items-center justify-center text-[11px] font-black text-white shadow-sm shrink-0 uppercase`}>
+        {firstLetter}
+      </div>
+    );
+  };
+
   return (
     <motion.div 
       ref={postRef}
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -6 }}
       animate={isHighlighted ? "pulse" : ""}
       variants={highlightVariants}
-      className={`flex flex-col sm:flex-row gap-0 sm:gap-2 group cursor-pointer bg-white border rounded-2xl hover:bg-bg-base/50 transition-colors overflow-hidden ${
-        isHighlighted ? 'border-brand-primary ring-4 ring-brand-primary/10 z-10' : 'border-border'
+      className={`flex flex-col gap-0 group cursor-pointer bg-gradient-to-br from-white to-brand-primary/[0.02] border rounded-[2rem] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] hover:border-brand-primary/20 hover:shadow-[0_24px_48px_-12px_rgba(124,58,237,0.15)] transition-all duration-500 relative ring-1 ring-white/50 ${
+        isHighlighted ? 'border-brand-primary ring-8 ring-brand-primary/10 z-10' : 'border-slate-200/60'
       }`}
     >
-      {/* Vote Column - Hidden on very small mobile, shown on SM+ */}
-      <div className="hidden sm:flex flex-col items-center py-4 px-2 bg-bg-base/30 group-hover:bg-bg-base transition-colors border-r border-border/50">
-        <button 
-          onClick={(e) => handleVote('up', e)}
-          className={`p-1 rounded hover:bg-orange-100 transition-colors ${vote === 'up' ? 'text-orange-600 bg-orange-50' : 'text-text-muted'}`}
-        >
-          <ArrowBigUp className={`h-7 w-7 ${vote === 'up' ? 'fill-orange-600' : ''}`} />
-        </button>
-        <span className={`text-sm font-black my-1 ${vote === 'up' ? 'text-orange-600' : vote === 'down' ? 'text-blue-600' : 'text-text-primary'}`}>
-          {upvotes}
-        </span>
-        <button 
-          onClick={(e) => handleVote('down', e)}
-          className={`p-1 rounded hover:bg-blue-100 transition-colors ${vote === 'down' ? 'text-blue-600 bg-blue-50' : 'text-text-muted'}`}
-        >
-          <ArrowBigDown className={`h-7 w-7 ${vote === 'down' ? 'fill-blue-600' : ''}`} />
-        </button>
-      </div>
-
       {/* Content Area */}
-      <div className="flex-1 p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-[10px] font-black uppercase tracking-widest text-brand-primary">
-            c/{category}
-          </span>
-          <span className="text-text-muted text-[10px] uppercase font-bold tracking-widest">•</span>
-          <span className="text-[10px] font-medium text-text-muted uppercase tracking-widest">
-            Posted by u/{authorName} • {timeAgo}
-          </span>
+      <div className="flex-1 p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+           <div className="flex items-center gap-3">
+              {authorAvatar ? (
+                 <img src={authorAvatar} alt={authorName} className="w-8 h-8 rounded-full object-cover shadow-sm shrink-0" />
+              ) : getInitialAvatar(authorName)}
+              <div className="flex flex-col -space-y-0.5">
+                 <span className="text-[10px] sm:text-[11px] font-black text-brand-primary uppercase tracking-widest">c/{category}</span>
+                 <span className="text-[10px] sm:text-[11px] font-bold text-text-muted">Posted by {authorName} • {timeAgo}</span>
+              </div>
+           </div>
+           <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest whitespace-nowrap shrink-0 transition-colors shadow-sm ${flairStyles[flair]}`}>
+             {flair}
+           </span>
         </div>
 
-        <div className="space-y-3 mb-6">
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="text-base sm:text-lg font-bold text-text-primary leading-tight group-hover:text-brand-primary transition-colors">
-              {title}
+        <div className="space-y-4 mb-8">
+          <div className="relative">
+            <h3 className={`font-black text-slate-900 leading-[1.25] group-hover:text-brand-primary transition-colors break-words break-all sm:break-words tracking-tight ${isDetailedView ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl line-clamp-2'}`}>
+              {translatedTitle} {targetLang !== 'Original' && <span className="text-[9px] text-brand-primary font-black uppercase tracking-[0.15em] ml-3 bg-brand-primary/10 px-3 py-1 rounded-full inline-flex items-center align-middle whitespace-nowrap border border-brand-primary/20">Translated</span>}
             </h3>
-            <span className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[8px] sm:text-[9px] font-black uppercase tracking-tighter whitespace-nowrap ${flairStyles[flair]}`}>
-              {flair}
-            </span>
           </div>
-          <p className="text-sm text-text-muted line-clamp-3 font-medium leading-relaxed">
-            {renderContentWithHashtags(content)}
-          </p>
+          
+          <div className="relative">
+             {isTranslating && (
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+                   <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+             )}
+             <p className={`text-sm sm:text-base text-text-muted/80 font-medium leading-relaxed break-words break-all sm:break-words w-full overflow-hidden ${isDetailedView ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
+               {renderContentWithHashtags(translatedContent)}
+             </p>
+          </div>
           
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-2 pt-2">
               {tags.map(tag => (
-                <span key={tag} className="text-[10px] font-bold text-brand-primary bg-brand-primary/5 px-2 py-1 rounded-full">
+                <span key={tag} className="text-[10px] font-bold text-brand-primary bg-brand-primary/5 hover:bg-brand-primary/10 px-3 py-1.5 rounded-xl border border-brand-primary/10 transition-colors">
                   #{tag}
                 </span>
               ))}
@@ -198,28 +335,261 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-6 border-t border-border/40 pt-4 sm:pt-0 sm:border-0">
-          {/* Mobile-only Vote Row */}
-          <div className="sm:hidden flex items-center gap-3 bg-bg-base px-2 py-1 rounded-full border border-border">
-             <button onClick={(e) => handleVote('up', e)}><ArrowBigUp className={`h-5 w-5 ${vote === 'up' ? 'text-orange-600 fill-orange-600' : 'text-text-muted'}`} /></button>
-             <span className="text-xs font-black">{upvotes}</span>
-             <button onClick={(e) => handleVote('down', e)}><ArrowBigDown className={`h-5 w-5 ${vote === 'down' ? 'text-blue-600 fill-blue-600' : 'text-text-muted'}`} /></button>
-          </div>
+        <div className="flex items-center gap-4 sm:gap-6 pt-6 border-t border-slate-100">
+          {/* Like Button */}
+          <motion.div 
+             whileHover={{ scale: 1.05 }}
+             whileTap={{ scale: 0.95 }}
+             onClick={(e) => handleVote('up', e)}
+             className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all cursor-pointer border ${vote === 'up' ? 'text-rose-600 bg-rose-50 border-rose-100 shadow-sm' : 'text-text-muted bg-slate-50 hover:bg-white hover:border-slate-200 border-transparent'}`}
+          >
+             <Heart className={`h-4 w-4 ${vote === 'up' ? 'fill-rose-600' : ''}`} />
+             <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.1em]">{upvotes} <span className="hidden xs:inline">Likes</span></span>
+          </motion.div>
 
-          <div className="flex items-center gap-2 text-text-muted hover:bg-bg-base px-2 py-1.5 rounded-lg transition-colors cursor-pointer" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+          {/* Comment Button */}
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all cursor-pointer border ${showComments ? 'text-blue-600 bg-blue-50 border-blue-100 shadow-sm' : 'text-text-muted bg-slate-50 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100 border-transparent'}`}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowComments(!showComments); }}
+          >
             <MessageSquare className="h-4 w-4" />
-            <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest">{comments} <span className="hidden xs:inline">Comments</span></span>
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.1em]">{localComments.length || comments} <span className="hidden xs:inline">Comments</span></span>
+          </motion.div>
+
+          {/* Share Button */}
+          <div className="relative group/share" ref={shareMenuRef}>
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border transition-all cursor-pointer ${isCopied ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-text-muted bg-slate-50 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-100 border-transparent'}`}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowShareMenu(!showShareMenu); setShowLangMenu(false); }}
+            >
+              <Share2 className="h-4 w-4" />
+              <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-[0.1em] transition-colors`}>
+                 {isCopied ? 'Link Copied!' : 'Share'}
+              </span>
+            </motion.div>            {/* Advanced Share Modal - Matching User Mockup - Rendered via Portal */}
+            {mounted && createPortal(
+              <AnimatePresence>
+                {showShareMenu && (
+                  <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setShowShareMenu(false)}
+                      className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                    />
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                      className="relative w-full max-w-[420px] bg-white rounded-[3rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.5)] border border-white/20 p-8 sm:p-10 z-[10000] overflow-hidden"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button 
+                        onClick={() => setShowShareMenu(false)}
+                        className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-50 text-text-muted transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+
+                      <div className="text-center mb-8">
+                         <h4 className="text-2xl font-black text-text-primary tracking-tight mb-2">Share with Friends</h4>
+                         <p className="text-sm text-text-muted font-medium px-6 leading-relaxed">Expand your community by inviting others to this discussion!</p>
+                      </div>
+
+                      <div className="space-y-8">
+                         {/* Link Section */}
+                         <div className="space-y-3">
+                            <label className="text-[11px] font-black uppercase tracking-widest text-text-primary ml-1 opacity-60">Share your link</label>
+                            <div className="relative flex items-center bg-slate-50 rounded-2xl p-5 border border-slate-100 transition-all hover:bg-slate-100/50 group/link">
+                               <input 
+                                 readOnly 
+                                 value={`${window.location.origin}/feed/community/${id}`}
+                                 className="bg-transparent text-xs font-bold text-text-primary outline-none w-full pr-12 overflow-hidden text-ellipsis whitespace-nowrap" 
+                               />
+                               <button 
+                                 onClick={handleCopyLink}
+                                 className={`absolute right-4 p-2.5 rounded-xl transition-all ${isCopied ? 'bg-emerald-500 text-white' : 'text-text-muted hover:bg-slate-200 hover:text-text-primary'}`}
+                               >
+                                  {isCopied ? <CheckCircle2 className="w-5 h-5" /> : <LinkIcon className="w-5 h-5" />}
+                               </button>
+                            </div>
+                         </div>
+
+                         {/* Social Section */}
+                         <div className="space-y-4">
+                            <label className="text-[11px] font-black uppercase tracking-widest text-text-primary ml-1 opacity-60">Share to</label>
+                            <div className="flex justify-between items-center px-1">
+                               <motion.button 
+                                 whileHover={{ y: -8 }} 
+                                 whileTap={{ scale: 0.9 }}
+                                 onClick={(e) => shareToSocial('facebook', e)}
+                                 className="flex flex-col items-center gap-3 group/s"
+                               >
+                                  <div className="w-14 h-14 rounded-full bg-[#1877F2] flex items-center justify-center text-white shadow-xl shadow-blue-500/25 transition-transform group-hover/s:scale-110">
+                                     <Facebook className="w-6 h-6 fill-current" />
+                                  </div>
+                                  <span className="text-[11px] font-bold text-text-muted group-hover/s:text-text-primary transition-colors">Facebook</span>
+                               </motion.button>
+
+                               <motion.button 
+                                 whileHover={{ y: -8 }} 
+                                 whileTap={{ scale: 0.9 }}
+                                 onClick={(e) => shareToSocial('twitter', e)}
+                                 className="flex flex-col items-center gap-3 group/s"
+                               >
+                                  <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white shadow-xl shadow-black/25 transition-transform group-hover/s:scale-110">
+                                     <Twitter className="w-6 h-6" />
+                                  </div>
+                                  <span className="text-[11px] font-bold text-text-muted group-hover/s:text-text-primary transition-colors">X</span>
+                               </motion.button>
+
+                               <motion.button 
+                                 whileHover={{ y: -8 }} 
+                                 whileTap={{ scale: 0.9 }}
+                                 onClick={(e) => shareToSocial('whatsapp', e)}
+                                 className="flex flex-col items-center gap-3 group/s"
+                               >
+                                  <div className="w-14 h-14 rounded-full bg-[#25D366] flex items-center justify-center text-white shadow-xl shadow-green-500/25 transition-transform group-hover/s:scale-110">
+                                     <MessageCircle className="w-6 h-6" />
+                                  </div>
+                                  <span className="text-[11px] font-bold text-text-muted group-hover/s:text-text-primary transition-colors">Whatsapp</span>
+                               </motion.button>
+
+                               <motion.button 
+                                 whileHover={{ y: -8 }} 
+                                 whileTap={{ scale: 0.9 }}
+                                 onClick={(e) => shareToSocial('telegram', e)}
+                                 className="flex flex-col items-center gap-3 group/s"
+                               >
+                                  <div className="w-14 h-14 rounded-full bg-[#0088CC] flex items-center justify-center text-white shadow-xl shadow-sky-500/25 transition-transform group-hover/s:scale-110">
+                                     <Send className="w-6 h-6 -rotate-12 translate-x-px" />
+                                  </div>
+                                  <span className="text-[11px] font-bold text-text-muted group-hover/s:text-text-primary transition-colors">Telegram</span>
+                               </motion.button>
+
+                               <motion.button 
+                                 whileHover={{ y: -8 }} 
+                                 whileTap={{ scale: 0.9 }}
+                                 onClick={(e) => shareToSocial('linkedin', e)}
+                                 className="flex flex-col items-center gap-3 group/s"
+                               >
+                                  <div className="w-14 h-14 rounded-full bg-[#0A66C2] flex items-center justify-center text-white shadow-xl shadow-blue-600/25 transition-transform group-hover/s:scale-110">
+                                     <Linkedin className="w-6 h-6" />
+                                  </div>
+                                  <span className="text-[11px] font-bold text-text-muted group-hover/s:text-text-primary transition-colors">LinkedIn</span>
+                               </motion.button>
+                            </div>
+                         </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
+              </AnimatePresence>,
+              document.body
+            )}
           </div>
-          <div onClick={handleShare} className="flex items-center gap-2 text-text-muted hover:bg-bg-base px-2 py-1.5 rounded-lg transition-colors cursor-pointer">
-            <Share2 className="h-4 w-4" />
-            <span className={`text-[10px] sm:text-xs font-black uppercase tracking-widest transition-colors ${isCopied ? 'text-brand-success' : ''}`}>
-               {isCopied ? 'Copied Link!' : 'Share'}
-            </span>
+          
+          {/* Translate Button & Menu */}
+          <div className="ml-auto relative" ref={langMenuRef}>
+             <motion.div 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowLangMenu(!showLangMenu); setShowShareMenu(false); }}
+                className={`flex items-center gap-2 text-text-muted bg-slate-50 hover:bg-brand-primary/10 hover:text-brand-primary hover:border-brand-primary/20 border border-transparent px-4 py-2.5 rounded-2xl transition-all cursor-pointer`}
+             >
+                <Languages className="w-4 h-4" />
+                <span className="hidden sm:inline text-[10px] sm:text-[11px] font-black uppercase tracking-[0.1em]">{targetLang === 'Original' ? 'Translate' : targetLang}</span>
+             </motion.div>
+             
+             {showLangMenu && (
+              <motion.div 
+                initial={{ opacity: 0, y: 15, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 15, scale: 0.9 }}
+                className="absolute bottom-full right-0 mb-4 w-52 bg-white rounded-[2rem] shadow-2xl border border-slate-100 p-2 z-50 flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] px-4 py-3 sticky top-0 bg-white/90 backdrop-blur-sm z-10 border-b border-slate-100 mb-1">Matrix Engine</div>
+                {TRANSLATION_LANGUAGES.map(lang => (
+                   <button 
+                     key={lang.code}
+                     onClick={(e) => handleTranslate(lang.code, e)}
+                     className={`flex items-center justify-between w-full text-left px-4 py-3 text-[11px] uppercase tracking-widest font-black rounded-2xl transition-all ${targetLang === lang.code ? 'bg-brand-primary/10 text-brand-primary' : 'hover:bg-slate-50 text-text-primary'}`}
+                   >
+                     {lang.name}
+                     {targetLang === lang.code && <CheckCircle2 className="w-3.5 h-3.5" />}
+                   </button>
+                ))}
+              </motion.div>
+            )}
           </div>
-          <button className="ml-auto p-1.5 hover:bg-bg-base rounded-lg transition-colors">
-            <MoreHorizontal className="h-5 w-5 text-text-muted" />
-          </button>
         </div>
+        {/* Inline Comments Section */}
+        <AnimatePresence>
+          {showComments && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="pt-8 mt-8 border-t border-slate-100 mx-8 mb-8">
+                 <h4 className="text-sm font-black text-text-primary uppercase tracking-widest mb-6">Discussion ({localComments.length || comments})</h4>
+                 
+                 {/* New Comment Input */}
+                 <form onSubmit={handleAddComment} className="flex gap-3 mb-8">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-text-muted shrink-0 uppercase">U</div>
+                    <div className="flex-1 relative">
+                       <input 
+                         type="text"
+                         value={commentText}
+                         onChange={(e) => setCommentText(e.target.value)}
+                         placeholder="Add a comment..."
+                         className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all pr-12"
+                       />
+                       <button 
+                         type="submit"
+                         disabled={!commentText.trim() || isSubmittingComment}
+                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-brand-primary hover:bg-brand-primary/10 rounded-lg transition-all disabled:opacity-30"
+                       >
+                          {isSubmittingComment ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                       </button>
+                    </div>
+                 </form>
+
+                 {/* Comments List */}
+                 <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {localComments.map((comment, idx) => (
+                      <div key={idx} className="flex gap-4 group/c">
+                         <div className="w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center text-[10px] font-black text-brand-primary shrink-0 uppercase">
+                            {comment.userName?.charAt(0) || 'A'}
+                         </div>
+                         <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                               <span className="text-xs font-black text-text-primary uppercase tracking-wide">{comment.userName || 'Anonymous'}</span>
+                               <span className="text-[9px] text-text-muted font-bold uppercase tracking-widest">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <p className="text-sm text-text-muted leading-relaxed">{comment.text}</p>
+                         </div>
+                      </div>
+                    ))}
+                    {localComments.length === 0 && !isSubmittingComment && (
+                      <div className="text-center py-8">
+                         <MessageCircle className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                         <p className="text-xs font-bold text-text-muted uppercase tracking-widest">No comments yet. Start the conversation!</p>
+                      </div>
+                    )}
+                 </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

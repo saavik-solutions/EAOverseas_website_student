@@ -19,6 +19,12 @@ if (!cached) {
 
 async function connectToDatabase() {
   if (cached.conn) {
+    // Ensure models are registered even if the connection is cached
+    require('./models/User');
+    require('./models/Post');
+    require('./models/Notification');
+    require('./models/Blog');
+    require('./models/Lead');
     return cached.conn;
   }
 
@@ -38,6 +44,14 @@ async function connectToDatabase() {
 
   try {
     cached.conn = await cached.promise;
+    
+    // Ensure all models are registered in the current connection context
+    require('./models/User');
+    require('./models/Post');
+    require('./models/Notification');
+    require('./models/Blog');
+    require('./models/Lead');
+
   } catch (e) {
     cached.promise = null;
     throw e;

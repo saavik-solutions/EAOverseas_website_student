@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 export default function GlobalBroadcastPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [flair, setFlair] = useState('Announcement');
   const [posts, setPosts] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -51,11 +52,12 @@ export default function GlobalBroadcastPage() {
       const res = await fetch('/api/admin/broadcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content, flair })
+        body: JSON.stringify({ title, content, flair, imageUrl })
       });
       if (res.ok) {
         setTitle('');
         setContent('');
+        setImageUrl('');
         alert('Institutional Communication Deactivated: Success');
         fetchPosts();
       } else {
@@ -144,8 +146,26 @@ export default function GlobalBroadcastPage() {
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Author official synchronization message..."
-                    className="w-full h-40 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-slate-100 outline-none resize-none transition-all" 
+                    className="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-slate-100 outline-none resize-none transition-all" 
                  />
+              </div>
+
+              <div className="space-y-4">
+                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Transmission Media (Image URL)</label>
+                 <div className="flex gap-4">
+                    <input 
+                       type="text" 
+                       value={imageUrl}
+                       onChange={(e) => setImageUrl(e.target.value)}
+                       placeholder="https://example.com/image.jpg"
+                       className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-slate-100 outline-none transition-all" 
+                    />
+                    {imageUrl && (
+                       <div className="w-24 h-12 rounded-lg border border-slate-200 overflow-hidden shrink-0">
+                          <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                       </div>
+                    )}
+                 </div>
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t border-slate-50">

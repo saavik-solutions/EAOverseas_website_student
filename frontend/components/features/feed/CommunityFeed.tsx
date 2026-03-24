@@ -82,7 +82,7 @@ export const CommunityFeed: React.FC = () => {
         <aside className="hidden lg:block lg:col-span-3 xl:col-span-2 space-y-4">
           {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-10 bg-bg-base rounded-xl animate-pulse" />)}
         </aside>
-        <main className="lg:col-span-9 xl:col-span-7 space-y-6">
+        <main className="lg:col-span-9 xl:col-span-7 space-y-8">
           <div className="h-20 bg-white border border-border rounded-2xl animate-pulse" />
           {[1, 2, 3].map(i => <div key={i} className="h-48 bg-white border border-border rounded-2xl animate-pulse" />)}
         </main>
@@ -149,7 +149,7 @@ export const CommunityFeed: React.FC = () => {
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-8">
           {posts.length === 0 ? (
             <div className="bg-white border text-center border-border rounded-2xl p-12">
               <div className="w-16 h-16 mx-auto bg-brand-primary/10 rounded-full flex items-center justify-center mb-4">

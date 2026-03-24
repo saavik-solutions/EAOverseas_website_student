@@ -22,26 +22,26 @@ export const FeedTabs: React.FC = () => {
   };
 
   return (
-    <div className="sticky top-0 z-10 bg-bg-base/80 backdrop-blur-md border-b border-border">
-      <div className="container max-w-7xl px-4">
-        <div className="flex gap-8">
+    <div className="sticky top-[80px] z-20 bg-white/80 backdrop-blur-xl border-b border-border/50 py-4 w-full">
+      <div className="max-w-xl mx-auto px-4 w-full">
+        <div className="flex bg-slate-100 p-1.5 rounded-2xl relative shadow-inner w-full">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 py-4 text-sm font-bold transition-all relative ${
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 text-sm sm:text-base font-black transition-all relative z-10 rounded-xl ${
                   isActive ? 'text-brand-primary' : 'text-text-muted hover:text-text-primary'
                 }`}
               >
-                <tab.icon className={`h-4 w-4 ${isActive ? 'text-brand-primary' : 'text-text-muted'}`} />
+                <tab.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${isActive ? 'text-brand-primary' : 'text-text-muted'}`} />
                 {tab.label}
                 {isActive && (
                   <motion.div
-                    layoutId="feed-tab-underline"
-                    className="absolute bottom-0 left-0 right-0 h-1 bg-brand-primary rounded-t-full"
-                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    layoutId="active-feed-tab-pill"
+                    className="absolute inset-0 bg-white rounded-xl shadow-sm border border-black/5 -z-10"
+                    transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
                   />
                 )}
               </button>

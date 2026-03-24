@@ -34,6 +34,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             name: newUser.fullName,
             role: newUser.role,
             onboardingCompleted: newUser.onboardingCompleted,
+            waitlistNumber: newUser.waitlistNumber,
+            isWaitlistJoined: newUser.isWaitlistJoined
           };
         }
 
@@ -61,6 +63,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.fullName,
           role: user.role,
           onboardingCompleted: user.onboardingCompleted || false,
+          waitlistNumber: user.waitlistNumber,
+          isWaitlistJoined: user.isWaitlistJoined
         };
       }
     })
@@ -71,6 +75,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
         token.id = user.id;
         token.onboardingCompleted = user.onboardingCompleted;
+        token.waitlistNumber = user.waitlistNumber;
+        token.isWaitlistJoined = user.isWaitlistJoined;
       }
       // Allow seamless frontend updating after API mutation
       if (trigger === "update" && session?.onboardingCompleted !== undefined) {
@@ -83,6 +89,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.role = token.role;
         session.user.id = token.id;
         session.user.onboardingCompleted = token.onboardingCompleted;
+        session.user.waitlistNumber = token.waitlistNumber;
+        session.user.isWaitlistJoined = token.isWaitlistJoined;
       }
       return session;
     }

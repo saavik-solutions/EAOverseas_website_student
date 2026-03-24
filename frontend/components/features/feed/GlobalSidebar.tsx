@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { TrendingUp, Calendar, ExternalLink } from 'lucide-react';
+import { TrendingUp, Calendar } from 'lucide-react';
 
 export const GlobalSidebar: React.FC = () => {
   const trending = [
@@ -16,12 +16,6 @@ export const GlobalSidebar: React.FC = () => {
     { title: "Visa Mastery Workshop", date: "Mar 22" },
     { title: "USA University Admissions", date: "Mar 25" },
     { title: "Part-time Jobs in Australia", date: "Mar 28" }
-  ];
-
-  const quickLinks = [
-    { label: "Visa Guides", color: "bg-blue-500" },
-    { label: "App Checklist", color: "bg-purple-500" },
-    { label: "Budget Calc", color: "bg-green-500" }
   ];
 
   return (
@@ -66,16 +60,6 @@ export const GlobalSidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Links */}
-       <div className="grid grid-cols-1 gap-4">
-         {quickLinks.map((link, idx) => (
-           <button key={idx} className="flex items-center justify-between p-4 bg-nav-bg rounded-2xl shadow-lg hover:translate-x-1 transition-all group overflow-hidden relative">
-             <div className={`absolute top-0 right-0 w-24 h-24 ${link.color} blur-[60px] opacity-20`} />
-             <span className="text-[11px] font-black uppercase tracking-widest text-white relative z-10">{link.label}</span>
-             <ExternalLink className="h-4 w-4 text-brand-accent relative z-10" />
-           </button>
-         ))}
-       </div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import './User'; // Force User model registration
 
 export interface INotification extends Document {
   type: 'info' | 'success' | 'warning' | 'error';

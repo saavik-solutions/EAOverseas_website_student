@@ -67,7 +67,7 @@ export default function NotificationGovernancePage() {
       case 'success': return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
       case 'error': return <XCircle className="h-4 w-4 text-rose-500" />;
       case 'warning': return <AlertCircle className="h-4 w-4 text-amber-500" />;
-      default: return <Info className="h-4 w-4 text-indigo-500" />;
+      default: return <Info className="h-4 w-4 text-brand-primary" />;
     }
   };
 

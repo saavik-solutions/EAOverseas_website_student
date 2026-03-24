@@ -13,11 +13,17 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal';
 
 export default function CommunityGovernancePage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Deletion Modal State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ postId: string, commentId?: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -50,32 +56,41 @@ export default function CommunityGovernancePage() {
     }
   };
 
-  const deletePost = async (postId: string) => {
-    if (!confirm('Operational Security: Permanently delete this user record?')) return;
+  const confirmDeletePost = (postId: string) => {
+    setItemToDelete({ postId });
+    setDeleteModalOpen(true);
+  };
+
+  const executeDelete = async () => {
+    if (!itemToDelete) return;
+    setIsDeleting(true);
     try {
-      await fetch('/api/admin/community', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId })
-      });
-      fetchPosts();
+      if (itemToDelete.commentId) {
+        await fetch('/api/admin/community', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemToDelete)
+        });
+      } else {
+        await fetch('/api/admin/community', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId: itemToDelete.postId })
+        });
+      }
+      await fetchPosts();
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     } catch (err) {
       alert('Termination Failed: Node persistent.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const deleteComment = async (postId: string, commentId: string) => {
-    if (!confirm('Operational Security: Neutralize this comment node?')) return;
-    try {
-      await fetch('/api/admin/community', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, commentId })
-      });
-      fetchPosts();
-    } catch (err) {
-      alert('Neutralization Failed.');
-    }
+  const confirmDeleteComment = (postId: string, commentId: string) => {
+    setItemToDelete({ postId, commentId });
+    setDeleteModalOpen(true);
   };
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -87,6 +102,14 @@ export default function CommunityGovernancePage() {
 
   return (
     <div className="space-y-8">
+      <DeleteConfirmationModal 
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={executeDelete}
+        title={itemToDelete?.commentId ? "Neutralize Comment" : "Delete Institutional Thread"}
+        description={itemToDelete?.commentId ? "Are you sure you want to permanently delete this comment? This action cannot be reversed." : "Are you sure you want to permanently delete this community thread and all its replies?"}
+        isDeleting={isDeleting}
+      />
       {/* Institutional Module Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-slate-200">
          <div>
@@ -190,12 +213,15 @@ export default function CommunityGovernancePage() {
                   <td className="px-8 py-5">
                      <div className="flex items-center justify-end gap-2">
                         <button 
-                          onClick={() => deletePost(post._id)}
+                          onClick={() => confirmDeletePost(post._id)}
                           className="p-2 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-xl transition-all"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <button className="p-2 hover:bg-slate-100 text-slate-300 hover:text-slate-900 rounded-xl transition-all">
+                        <button 
+                          onClick={() => window.open(`/feed/global/${post._id}`, '_blank')}
+                          className="p-2 hover:bg-slate-100 text-slate-300 hover:text-slate-900 rounded-xl transition-all"
+                        >
                           <ExternalLink className="h-4 w-4" />
                         </button>
                      </div>
@@ -215,7 +241,7 @@ export default function CommunityGovernancePage() {
                               </p>
                             </div>
                             <button 
-                              onClick={() => deleteComment(post._id, comment._id)}
+                              onClick={() => confirmDeleteComment(post._id, comment._id)}
                               className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
                             >
                               <Trash2 className="h-3.5 w-3.5" />

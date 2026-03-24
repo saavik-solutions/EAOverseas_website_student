@@ -9,14 +9,22 @@ import {
   ShieldCheck,
   Mail,
   GraduationCap,
-  Calendar
+  Calendar,
+  Eye
 } from 'lucide-react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal';
 
 export default function StudentDirectoryPage() {
   const [students, setStudents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Deletion Modal State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchStudents = async () => {
     try {
@@ -36,17 +44,27 @@ export default function StudentDirectoryPage() {
     fetchStudents();
   }, []);
 
-  const deleteStudent = async (userId: string) => {
-    if (!confirm('Operational Security: Permanently delete this student record across all institutional clusters?')) return;
+  const confirmDeleteStudent = (userId: string) => {
+    setStudentToDelete(userId);
+    setDeleteModalOpen(true);
+  };
+
+  const executeDelete = async () => {
+    if (!studentToDelete) return;
+    setIsDeleting(true);
     try {
       await fetch('/api/admin/students', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ userId: studentToDelete })
       });
-      fetchStudents();
+      await fetchStudents();
+      setDeleteModalOpen(false);
+      setStudentToDelete(null);
     } catch (err) {
       alert('Termination Failed.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -57,6 +75,14 @@ export default function StudentDirectoryPage() {
 
   return (
     <div className="space-y-8">
+      <DeleteConfirmationModal 
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={executeDelete}
+        title="Delete Student Record"
+        description="Are you sure you want to permanently delete this student record across all institutional clusters? This action cannot be reversed."
+        isDeleting={isDeleting}
+      />
       {/* Institutional Module Header */}
       <div className="pb-8 border-b border-slate-200">
          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Student Directory</h1>
@@ -139,8 +165,14 @@ export default function StudentDirectoryPage() {
                   </td>
                   <td className="px-8 py-5">
                      <div className="flex items-center justify-end gap-2">
+                        <Link 
+                          href={`/admin/students/${student._id}`}
+                          className="p-2.5 hover:bg-slate-100 text-slate-400 hover:text-brand-primary rounded-xl transition-all shadow-sm active:translate-y-[1px]"
+                        >
+                          <Eye className="h-4.5 w-4.5" />
+                        </Link>
                         <button 
-                          onClick={() => deleteStudent(student._id)}
+                          onClick={() => confirmDeleteStudent(student._id)}
                           className="p-2.5 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-xl transition-all shadow-sm active:translate-y-[1px]"
                         >
                           <Trash2 className="h-4.5 w-4.5" />

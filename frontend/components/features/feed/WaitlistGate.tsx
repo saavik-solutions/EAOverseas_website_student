@@ -47,12 +47,7 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
   }, [authStatus, session, isClient, router]);
 
   if (!isClient || authStatus === 'loading' || status === 'checking') {
-     return (
-        <div className="min-h-screen bg-bg-base flex flex-col items-center justify-center space-y-4">
-           <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
-           <p className="text-[10px] font-black uppercase tracking-widest text-text-muted animate-pulse">Verifying Access...</p>
-        </div>
-     );
+     return null;
   }
   
   if (authStatus === 'unauthenticated') return null; // Let the router push handle it

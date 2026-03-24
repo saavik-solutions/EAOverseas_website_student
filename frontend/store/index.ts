@@ -99,7 +99,12 @@ export const useUIStore = create<UIState>((set) => ({
   sidebarOpen: true,
   notifications: [],
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-  addNotification: (notification) => set((state) => ({ notifications: [notification, ...state.notifications] })),
+  addNotification: (notification) => set((state) => {
+    const now = Date.now();
+    const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000;
+    const validNotifications = state.notifications.filter(n => (now - new Date(n.timestamp).getTime()) < fourteenDaysMs);
+    return { notifications: [notification, ...validNotifications] };
+  }),
   markAsRead: (id) => set((state) => ({
     notifications: state.notifications.map((n) => n.id === id ? { ...n, read: true } : n)
   })),

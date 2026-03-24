@@ -4,11 +4,25 @@ import React, { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { PAIOnboarding } from '@/components/features/pai/PAIOnboarding';
 import { PAIResults } from '@/components/features/pai/PAIResults';
-import { PAIEngine, PAIResult } from '@/lib/services/pai-engine';
+import { PAIResult } from '@/lib/services/pai-engine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Zap, ShieldCheck, Sparkles } from 'lucide-react';
 
+import { ComingSoonGate } from '@/components/ui/ComingSoonGate';
+
 export default function PAIPage() {
+  return (
+    <DashboardLayout>
+       <ComingSoonGate 
+         featureName="AI Profile Intelligence" 
+         description="Our proprietary AI engine is currently calibrating for your region. Get ready for a next-generation audit experience." 
+         icon={Sparkles} 
+       />
+    </DashboardLayout>
+  );
+}
+
+function OldPAIPage() {
   const [status, setStatus] = useState<'onboarding' | 'analyzing' | 'completed'>('onboarding');
   const [result, setResult] = useState<PAIResult | null>(null);
   const [currentStepText, setCurrentStepText] = useState('Initializing AI Engine...');
@@ -32,17 +46,20 @@ export default function PAIPage() {
     }
 
     try {
-      // In a real app, passing formData to the engine
-      const analysis = await PAIEngine.analyze({
-        academic: { degree: 'Bachelors', gpa: 8.5, year: 2024, field: 'Computer Science' },
-        tests: { ielts: 7.5 },
-        experience: [{ role: 'Software Engineer', company: 'Innovation Labs', years: 2 }],
-        skills: ['React', 'Python', 'System Design'],
-        budget: 45000
+      const res = await fetch('/api/pai/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
-
-      setResult(analysis);
-      setStatus('completed');
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        setResult(data.analysis);
+        setStatus('completed');
+      } else {
+        throw new Error(data.error || 'Failed to generate PAI Audit');
+      }
     } catch (error) {
       console.error('Audit failed:', error);
       setStatus('onboarding');

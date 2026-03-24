@@ -22,8 +22,8 @@ export const GlobalFeed: React.FC = () => {
         const res = await fetch('/api/feed');
         if (res.ok) {
           const data = await res.json();
-          // Only show 'global' category posts that are 'published'
-          const globalPosts = (data.posts || []).filter((p: any) => p.category === 'global' && p.published !== false);
+          // Include 'general' discussions in the global stream for better community engagement
+          const globalPosts = (data.posts || []).filter((p: any) => (p.category === 'global' || p.category === 'general') && p.published !== false);
           setPosts(globalPosts);
         }
       } catch (err) {
@@ -51,16 +51,14 @@ export const GlobalFeed: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col xl:flex-row gap-8">
-        <aside className="xl:w-[240px] hidden xl:block">
-           <div className="card-premium h-96 animate-pulse" />
-        </aside>
-        <div className="flex-1 lg:max-w-[750px] space-y-8">
+      <div className="flex flex-col xl:flex-row gap-8 max-w-[1240px] mx-auto">
+        <div className="flex-1 space-y-8">
+          <div className="h-[60px] w-full bg-white rounded-2xl animate-pulse" />
           {[1, 2, 3].map((i) => (
             <div key={i} className="card-premium h-[400px] animate-pulse" />
           ))}
         </div>
-        <aside className="xl:w-[320px] space-y-8">
+        <aside className="xl:w-[320px] space-y-8 hidden xl:block">
           <div className="card-premium h-64 animate-pulse" />
         </aside>
       </div>
@@ -68,19 +66,19 @@ export const GlobalFeed: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col xl:flex-row gap-8 items-start">
-      {/* Search & Filter Discovery - Left Column */}
-      <aside className="xl:w-[240px] shrink-0 w-full xl:sticky xl:top-24">
-        <FeedFilterSidebar 
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-      </aside>
+    <div className="flex flex-col xl:flex-row gap-8 items-start max-w-[1240px] mx-auto">
+      {/* Main Intelligence Stream - Now with Horizontal Filters at Top */}
+      <div className="flex-1 w-full space-y-8">
+        {/* Horizontal Navigation & Discovery */}
+        <section className="w-full">
+          <FeedFilterSidebar 
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+        </section>
 
-      {/* Main Intelligence Stream - Center Column */}
-      <div className="flex-1 lg:max-w-[750px] w-full">
         <div className="grid grid-cols-1 gap-8">
           {filteredPosts.length === 0 ? (
             <div className="py-20 text-center bg-white rounded-3xl border-2 border-dashed border-border shadow-inner">
@@ -99,11 +97,17 @@ export const GlobalFeed: React.FC = () => {
             filteredPosts.map((post) => (
               <div key={post._id || post.id} onClick={() => handlePostClick(post._id || post.id)} className="cursor-pointer">
                 <FeedPost 
-                  {...post} 
                   id={post._id || post.id}
                   type={post.flair || post.type || 'NEWS'}
+                  title={post.title}
                   excerpt={post.content || post.excerpt}
+                  media={post.imageUrl || post.media}
+                  author={{
+                    name: post.authorId?.fullName || post.authorName || 'EAOverseas Official',
+                    logo: post.authorId?.avatarUrl || post.authorAvatar || post.authorName?.charAt(0) || 'E'
+                  }}
                   timestamp={post.createdAt ? new Date(post.createdAt).toLocaleDateString() : post.timestamp}
+                  views={post.views?.toString() || "0"}
                 />
               </div>
             ))
@@ -120,7 +124,7 @@ export const GlobalFeed: React.FC = () => {
       </div>
 
       {/* Regional Intelligence - Right Column */}
-      <aside className="xl:w-[320px] shrink-0 w-full">
+      <aside className="xl:w-[320px] shrink-0 w-full hidden xl:block sticky top-24">
         <GlobalSidebar />
       </aside>
 

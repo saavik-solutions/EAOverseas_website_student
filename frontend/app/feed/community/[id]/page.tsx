@@ -112,25 +112,26 @@ export default function DetailedPostPage() {
           <h3 className="text-lg font-black tracking-tight text-text-primary mb-6">Discussion ({post.commentsList?.length || 0})</h3>
 
           {/* New Top Level Comment Input */}
-          <div className="flex gap-4 mb-10">
-             <div className="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center font-black text-brand-primary shrink-0">
-               YOU
+          <div className="flex items-center gap-3 mb-10 bg-white p-3 border border-border rounded-2xl shadow-sm">
+             <div className="w-10 h-10 rounded-full bg-nav-bg flex items-center justify-center text-xs font-black text-white shrink-0">
+               {post.authorName ? 'A' : 'A'} {/* Static A as fallback for anonymous for now, handled generically */}
              </div>
-             <div className="flex-1 flex flex-col items-end gap-3">
-               <textarea 
-                 value={commentText}
-                 onChange={(e) => setCommentText(e.target.value)}
-                 placeholder="Share your perspective..."
-                 className="w-full min-h-[100px] p-4 bg-bg-base border border-border rounded-xl focus:border-brand-primary focus:ring-1 focus:ring-brand-primary resize-y font-medium text-sm text-text-primary placeholder:text-text-muted/50 transition-all outline-none"
-               />
-               <button 
-                 disabled={isSubmitting || !commentText.trim()}
-                 onClick={() => handleAction('comment')}
-                 className="btn-primary px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 group disabled:opacity-50"
-               >
-                 {isSubmitting && !replyingToId ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
-                 Post Comment
-               </button>
+             <div className="flex-1 relative flex items-center">
+                <input 
+                  type="text"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAction('comment') }}
+                  placeholder="Write a comment..."
+                  className="w-full h-10 pl-4 pr-12 bg-bg-base/50 border-none rounded-xl focus:ring-0 font-medium text-sm text-text-primary placeholder:text-text-muted/60 transition-all outline-none"
+                />
+                <button 
+                  disabled={isSubmitting || !commentText.trim()}
+                  onClick={() => handleAction('comment')}
+                  className="absolute right-1 w-8 h-8 flex items-center justify-center bg-brand-primary text-white rounded-lg hover:bg-brand-primary/90 disabled:opacity-50 transition-all"
+                >
+                  {isSubmitting && !replyingToId ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                </button>
              </div>
           </div>
 

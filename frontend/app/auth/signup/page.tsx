@@ -26,6 +26,17 @@ export default function SignupPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Signup failed");
 
+      // Auto login after successful signup
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
       router.push('/onboarding');
     } catch (err: any) {
       setError(err.message);

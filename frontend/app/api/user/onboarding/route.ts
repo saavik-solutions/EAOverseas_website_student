@@ -15,12 +15,32 @@ export async function PUT(req: Request) {
 
     await connectToDatabase();
 
-    // Securely update the user flag directly in MongoDB
+    // Securely update the user with the full onboarding data
     const updatedUser = await User.findByIdAndUpdate(
       session.user.id,
       {
         onboardingCompleted: true,
-        // We can capture the form survey data here in the future
+        onboardingData: body,
+        fullName: body.fullName || session.user.name,
+        gender: body.gender,
+        phone: body.phone,
+        nationality: body.nationality,
+        dob: body.dob ? new Date(body.dob) : undefined,
+        education: body.education || [],
+        experience: body.experience || [],
+        targetCountries: body.targetCountries || [],
+        targetCourses: body.targetCourses ? [body.targetCourses] : [],
+        targetDegree: body.targetDegree,
+        specialization: body.specialization,
+        budget: body.budget,
+        intakeYear: body.intakeYear,
+        intakeSemester: body.intakeSemester,
+        ieltsScore: body.ieltsScore,
+        toeflScore: body.toeflScore,
+        greScore: body.greScore,
+        gmatScore: body.gmatScore,
+        isWaitlistJoined: true,
+        waitlistNumber: (await User.countDocuments()) + 755,
       },
       { new: true }
     );

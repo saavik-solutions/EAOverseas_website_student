@@ -9,14 +9,40 @@ export const UploadStep: React.FC = () => {
   const [portfolioUrl, setPortfolioUrl] = useState('');
   const [analysisStatus, setAnalysisStatus] = useState<string | null>(null);
 
-  const simulateAnalysis = () => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
     setIsUploading(true);
-    setAnalysisStatus('Parsing Resume...');
-    setTimeout(() => setAnalysisStatus('Scanning Portfolio...'), 2000);
-    setTimeout(() => {
-      setAnalysisStatus('Done!');
+    setAnalysisStatus('Parsing Resume PDF...');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/user/resume-upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        setAnalysisStatus('Extracting Key Metrics...');
+        setTimeout(() => {
+          setAnalysisStatus('Done!');
+          setIsUploading(false);
+        }, 1500);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Upload failed');
+        setAnalysisStatus(null);
+        setIsUploading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Upload failed');
+      setAnalysisStatus(null);
       setIsUploading(false);
-    }, 4000);
+    }
   };
 
   return (
@@ -25,17 +51,22 @@ export const UploadStep: React.FC = () => {
         {/* Resume Uploader */}
         <div className="space-y-6">
           <h3 className="text-sm font-black uppercase tracking-widest text-text-primary">Resume / CV</h3>
-          <div 
-            onClick={simulateAnalysis}
-            className="h-64 border-2 border-dashed border-border rounded-[2.5rem] bg-bg-base/30 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-brand-primary hover:bg-brand-primary/5 transition-all group p-8 text-center"
-          >
-             <div className="w-16 h-16 rounded-2xl bg-white border border-border flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform shadow-sm">
-                <Upload className="h-8 w-8" />
-             </div>
-             <div className="space-y-1">
-               <p className="text-sm font-black text-text-primary">Drag & drop your resume</p>
-               <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">PDF or DOCX (Max 5MB)</p>
-             </div>
+          <div className="relative">
+            <input 
+              type="file" 
+              accept=".pdf" 
+              onChange={handleFileUpload} 
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+            />
+            <div className="h-64 border-2 border-dashed border-border rounded-[2.5rem] bg-bg-base/30 flex flex-col items-center justify-center gap-4 hover:border-brand-primary hover:bg-brand-primary/5 transition-all group p-8 text-center relative z-0">
+               <div className="w-16 h-16 rounded-2xl bg-white border border-border flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform shadow-sm">
+                  <Upload className="h-8 w-8" />
+               </div>
+               <div className="space-y-1">
+                 <p className="text-sm font-black text-text-primary">Drag & drop your resume</p>
+                 <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">PDF ONLY (Max 5MB)</p>
+               </div>
+            </div>
           </div>
         </div>
 

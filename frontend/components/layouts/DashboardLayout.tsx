@@ -7,6 +7,7 @@ import { NotificationBell } from '@/components/features/NotificationBell';
 import { Menu, X, LogOut, User as UserIcon } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { WaitlistGate } from '@/components/features/feed/WaitlistGate';
 import { NotificationManager } from '@/components/features/NotificationManager';
 
@@ -16,25 +17,35 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const waitlistNumber = (session?.user as any)?.waitlistNumber;
 
   const userInitial = session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'U';
 
   return (
     <div className="flex min-h-screen bg-bg-base">
       <NotificationManager />
-      {/* Sidebar - Collapsible to Desktop Icon Rail if needed, currently fixed */}
-      {/* <div className="hidden lg:block">
-         <Sidebar />
-      </div> */}
+      
+      {/* Global Sidebar */}
+      <Sidebar 
+        isOpenMobile={isMobileSidebarOpen} 
+        onCloseMobile={() => setIsMobileSidebarOpen(false)} 
+      />
 
 
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen lg:pl-[64px] transition-all duration-300">
         {/* Top Navigation / Global Bar */}
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between px-6 bg-white/80 backdrop-blur-md border-b border-border shadow-sm">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between px-4 sm:px-6 bg-white/80 backdrop-blur-md border-b border-border shadow-sm">
           <div className="flex items-center gap-4 flex-1">
-
+            <button 
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="p-2 -ml-2 rounded-xl text-text-muted hover:bg-bg-base lg:hidden transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
             <SearchBar />
           </div>
           
@@ -50,6 +61,14 @@ export default function DashboardLayout({
               </p>
             </div>
             <NotificationBell />
+            
+            {waitlistNumber && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-lg shadow-sm">
+                <span className="text-[9px] font-black text-brand-primary uppercase tracking-[0.2em]">Waitlist</span>
+                <span className="text-[11px] font-black text-brand-primary tabular-nums">#{waitlistNumber}</span>
+              </div>
+            )}
+
             <div className="h-8 w-[1px] bg-border mx-2" />
             
             {status === 'authenticated' && session?.user ? (
@@ -82,11 +101,15 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6 lg:p-10">
+        <main className="flex-1 p-4 sm:p-6 lg:p-10">
           <div className="max-w-[1400px] mx-auto">
-            <WaitlistGate>
-              {children}
-            </WaitlistGate>
+            {pathname === '/onboarding' ? (
+              children
+            ) : (
+              <WaitlistGate>
+                {children}
+              </WaitlistGate>
+            )}
           </div>
         </main>
       </div>
