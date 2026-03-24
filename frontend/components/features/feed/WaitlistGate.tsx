@@ -46,7 +46,7 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
         if (authStatus === 'unauthenticated' && !pathname.startsWith('/auth')) {
           router.push('/auth/login');
         }
-      }, 500);
+      }, 3000);
       return () => clearTimeout(timeout);
     }
 
@@ -81,8 +81,15 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
 
   if (!isClient) return null;
   
-  // If we're unauthenticated on a protected page, show nothing while we redirect
-  if (authStatus === 'unauthenticated' && !pathname.startsWith('/auth')) return null;
+  // If we're unauthenticated on a protected page, show the spinner while we wait for the buffer
+  if (authStatus === 'unauthenticated' && !pathname.startsWith('/auth')) {
+     return (
+       <div className="w-full h-[50vh] flex flex-col items-center justify-center space-y-4">
+         <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+         <p className="text-sm font-black text-text-muted uppercase tracking-widest animate-pulse">Verifying Session...</p>
+       </div>
+     );
+  }
 
   // If we're loading or checking, show the professional spinner
   if (authStatus === 'loading' || status === 'checking') {

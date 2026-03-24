@@ -271,7 +271,11 @@ export default function OnboardingPage() {
           }
         }
         // Force session update to reflect onboarding completion
-        await update({ onboardingCompleted: true });
+        try {
+          await update({ onboardingCompleted: true });
+        } catch (e) {
+          console.error("Session update error (passive):", e);
+        }
       }
       // Redirect happens in onComplete callback of AIAnalyzingScreen
     } catch (error) {
@@ -286,7 +290,7 @@ export default function OnboardingPage() {
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-bg-base pt-20 pb-12 px-4 relative">
-        {isAnalyzing && <AIAnalyzingScreen onComplete={() => router.push('/dashboard')} />}
+        {isAnalyzing && <AIAnalyzingScreen onComplete={() => window.location.href = '/dashboard'} />}
         
         <div className="max-w-4xl mx-auto relative">
           {/* Header */}
