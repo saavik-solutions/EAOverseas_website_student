@@ -22,7 +22,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const savedPosts = user.savedPosts || [];
     const postIdStr = params.id;
     
-    const postIndex = savedPosts.findIndex(id => id.toString() === postIdStr);
+    const postIndex = (savedPosts as any[]).findIndex((id: any) => id.toString() === postIdStr);
     let isSaved = false;
 
     if (postIndex === -1) {
