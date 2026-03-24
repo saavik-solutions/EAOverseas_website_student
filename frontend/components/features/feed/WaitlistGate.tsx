@@ -72,6 +72,9 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
 
   if (!isClient) return null;
   
+  // Do not show any loading state if unauthenticated to avoid "hangs" on protected pages before redirect
+  if (authStatus === 'unauthenticated' && !pathname.startsWith('/auth')) return null;
+
   if (authStatus === 'loading' || status === 'checking') {
      return (
        <div className="w-full h-[50vh] flex flex-col items-center justify-center space-y-4">
