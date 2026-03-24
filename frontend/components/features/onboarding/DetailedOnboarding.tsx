@@ -29,7 +29,10 @@ export default function DetailedOnboarding({ onComplete, onClose }: DetailedOnbo
             const res = await fetch('/api/user/complete-profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    ...formData,
+                    targetCountries: [formData.targetCountries]
+                })
             });
 
             if (res.ok) {
