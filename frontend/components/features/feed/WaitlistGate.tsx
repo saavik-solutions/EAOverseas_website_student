@@ -63,7 +63,7 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
         setStatus('form');
       }
     } else if (authStatus === 'unauthenticated') {
-      setStatus('passed'); // Guests should see content; middleware handles protection
+      router.push('/auth/login');
     }
   }, [authStatus, session, isClient, router, pathname, hasJoinedJustNow]);
 
