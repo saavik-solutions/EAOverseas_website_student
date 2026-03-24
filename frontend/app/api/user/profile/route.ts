@@ -34,6 +34,12 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     await connectToDatabase();
 
+    // Check if profile is locked
+    const existingUser = await User.findById(session.user.id);
+    if (existingUser?.isLocked) {
+      return NextResponse.json({ error: 'Profile is locked and cannot be edited' }, { status: 403 });
+    }
+
     const allowedFields = [
       'fullName', 'gender', 'bio', 'skills', 'education', 'experience', 
       'phone', 'nationality', 'targetCountries', 'targetCourses', 'targetDegree',

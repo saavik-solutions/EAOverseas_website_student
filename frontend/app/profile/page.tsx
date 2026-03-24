@@ -11,7 +11,7 @@ import {
   Info, History, BarChart3, Bookmark, 
   PenLine, Sparkles, CheckCircle2, ChevronRight, 
   QrCode, CreditCard, RefreshCw, LogOut,
-  User as UserIcon, Download, Share2, X, Save
+  User as UserIcon, Download, Share2, X, Save, Lock as LockIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -127,8 +127,12 @@ export default function ProfilePage() {
                         <section className="p-8 md:p-10 bg-white border border-border rounded-[2.5rem] md:rounded-[3rem] space-y-6 relative group shadow-sm transition-shadow hover:shadow-md">
                            <div className="flex items-center justify-between">
                               <h3 className="text-xl md:text-2xl font-black text-text-primary tracking-tight">About Me</h3>
-                              <button onClick={() => setIsEditing(!isEditing)} className="p-3 bg-bg-base rounded-xl text-text-muted hover:text-brand-primary transition-all">
-                                 <PenLine className="h-4 w-4" />
+                              <button 
+                                onClick={() => !user?.isLocked && setIsEditing(!isEditing)} 
+                                disabled={user?.isLocked}
+                                className={`p-3 rounded-xl transition-all ${user?.isLocked ? 'bg-slate-50 text-slate-300 cursor-not-allowed' : 'bg-bg-base text-text-muted hover:text-brand-primary'}`}
+                              >
+                                 {user?.isLocked ? <LockIcon className="h-4 w-4" /> : <PenLine className="h-4 w-4" />}
                               </button>
                            </div>
                             <p className="text-base md:text-lg font-medium text-text-secondary leading-relaxed">

@@ -59,6 +59,7 @@ export interface IUser extends Document {
     paiAnalysis?: IPAIAnalysis;
     isWaitlistJoined: boolean;
     waitlistNumber?: number;
+    isLocked: boolean;
     resumeText?: string;
     savedPosts?: mongoose.Schema.Types.ObjectId[];
     createdAt: Date;
@@ -96,6 +97,7 @@ const UserSchema: Schema = new Schema(
         paiAnalysis: { type: Object },
         isWaitlistJoined: { type: Boolean, default: false },
         waitlistNumber: { type: Number },
+        isLocked: { type: Boolean, default: false },
         resumeText: { type: String },
         savedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     },
