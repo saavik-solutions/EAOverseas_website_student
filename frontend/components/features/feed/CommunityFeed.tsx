@@ -64,7 +64,12 @@ export const CommunityFeed: React.FC = () => {
         const response = await fetch('/api/feed');
         if (response.ok) {
           const data = await response.json();
-          setPosts(data.posts || []);
+          // Filter for user-only discussions in the Community Feed
+          const communityPosts = (data.posts || []).filter((p: any) => 
+            p.authorName !== 'EAOverseas Official' && 
+            p.authorId?.role !== 'admin'
+          );
+          setPosts(communityPosts);
           setStats(data.stats || null);
         }
       } catch (error) {

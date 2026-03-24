@@ -22,8 +22,11 @@ export const GlobalFeed: React.FC = () => {
         const res = await fetch('/api/feed');
         if (res.ok) {
           const data = await res.json();
-          // Include 'general' discussions in the global stream for better community engagement
-          const globalPosts = (data.posts || []).filter((p: any) => (p.category === 'global' || p.category === 'general') && p.published !== false);
+          // Only show official posts in the Global Feed
+          const globalPosts = (data.posts || []).filter((p: any) => 
+            (p.authorName === 'EAOverseas Official' || p.authorId?.role === 'admin') && 
+            p.published !== false
+          );
           setPosts(globalPosts);
         }
       } catch (err) {
