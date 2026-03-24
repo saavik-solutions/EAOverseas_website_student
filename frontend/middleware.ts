@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   // getToken automatically uses NEXTAUTH_SECRET from environment
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET! });
   const isAuth = !!token;
 
   const pathname = req.nextUrl.pathname;

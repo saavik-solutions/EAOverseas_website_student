@@ -52,6 +52,7 @@ const PostSchema = new mongoose_1.Schema({
     authorAvatar: { type: String },
     title: { type: String, required: true },
     content: { type: String, required: true },
+    imageUrl: { type: String },
     category: { type: String, default: 'general' },
     tags: [{ type: String }],
     upvotes: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }],
