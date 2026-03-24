@@ -50,10 +50,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }: any) {
-      if (token) {
+      if (token && session.user) {
           session.user.id = token.id;
           session.user.role = token.role;
           session.user.fullName = token.fullName;
+          session.user.onboardingCompleted = token.onboardingCompleted;
+          session.user.waitlistNumber = token.waitlistNumber;
+          session.user.isWaitlistJoined = token.isWaitlistJoined;
           session.user.detailedFilled = token.detailedFilled;
           session.user.state = token.state;
       }
@@ -64,13 +67,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.id = user.id;
           token.role = user.role;
           token.fullName = user.name;
+          token.onboardingCompleted = user.onboardingCompleted;
+          token.waitlistNumber = user.waitlistNumber;
+          token.isWaitlistJoined = user.isWaitlistJoined;
           token.detailedFilled = user.detailedFilled;
           token.state = user.state;
       } else if (trigger === "update" && session) {
-          // Robust update handling for both payload structures
           const data = session.user || session;
           if (data.fullName) token.fullName = data.fullName;
           if (data.detailedFilled !== undefined) token.detailedFilled = data.detailedFilled;
+          if (data.onboardingCompleted !== undefined) token.onboardingCompleted = data.onboardingCompleted;
+          if (data.waitlistNumber !== undefined) token.waitlistNumber = data.waitlistNumber;
+          if (data.isWaitlistJoined !== undefined) token.isWaitlistJoined = data.isWaitlistJoined;
           if (data.state !== undefined) token.state = data.state;
       }
       return token;
