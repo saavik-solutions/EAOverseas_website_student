@@ -17,6 +17,7 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
   
   const [isClient, setIsClient] = useState(false);
   const [status, setStatus] = useState<'checking' | 'form' | 'success' | 'passed'>('checking');
+  const [hasJoinedJustNow, setHasJoinedJustNow] = useState(false);
   
   // Form State
   const [step, setStep] = useState(1);
@@ -43,26 +44,40 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
 
     if (authStatus === 'authenticated' && session?.user) {
       const u = session.user as any;
+      
+      // Override if they just joined to prevent session lag loop
+      if (hasJoinedJustNow) {
+        setStatus('passed');
+        return;
+      }
+
       if (u.role === 'admin' || (u.isWaitlistJoined && u.onboardingCompleted)) {
         setStatus('passed');
       } else if (u.isWaitlistJoined && !u.onboardingCompleted) {
-        // Already waitlisted but haven't finished full onboarding
         if (pathname !== '/onboarding') {
           router.push('/onboarding');
         } else {
-          setStatus('passed'); // Let them see the onboarding page
+          setStatus('passed');
         }
       } else {
         setStatus('form');
       }
+    } else if (authStatus === 'unauthenticated') {
+      setStatus('passed'); // Guests should see content; middleware handles protection
     }
-  }, [authStatus, session, isClient, router, pathname]);
+  }, [authStatus, session, isClient, router, pathname, hasJoinedJustNow]);
 
-  if (!isClient || authStatus === 'loading' || status === 'checking') {
-     return null;
+  if (!isClient) return null;
+  
+  if (authStatus === 'loading' || status === 'checking') {
+     return (
+       <div className="w-full h-[50vh] flex flex-col items-center justify-center space-y-4">
+         <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+         <p className="text-sm font-black text-text-muted uppercase tracking-widest animate-pulse">Initializing Flow...</p>
+       </div>
+     );
   }
   
-  if (authStatus === 'unauthenticated') return null; // Let the router push handle it
   if (status === 'passed') return <>{children}</>;
 
   const handleNext = () => setStep(s => s + 1);
@@ -79,6 +94,7 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
       });
       // Refresh session to pick up isWaitlistJoined
       await update();
+      setHasJoinedJustNow(true);
       router.push('/onboarding');
     } catch (e) {
       console.error("Failed to save onboarding.", e);
