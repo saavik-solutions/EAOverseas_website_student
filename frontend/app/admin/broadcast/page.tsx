@@ -71,16 +71,21 @@ export default function GlobalBroadcastPage() {
   };
 
   const deletePost = async (postId: string) => {
-    if (!confirm('Operational Security: Terminate this official broadcast record?')) return;
+    if (!confirm('Operational Security: Terminate this official broadcast record and associated signals?')) return;
     try {
-      await fetch('/api/admin/broadcast', {
+      const res = await fetch('/api/admin/broadcast', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId })
       });
-      fetchPosts();
+      if (res.ok) {
+        fetchPosts();
+      } else {
+        const data = await res.json();
+        alert(`Termination Failed: ${data.error || 'Unknown Error'}`);
+      }
     } catch (err) {
-      alert('Termination Failed.');
+      alert('Termination Failed: Network anomaly detected.');
     }
   };
 

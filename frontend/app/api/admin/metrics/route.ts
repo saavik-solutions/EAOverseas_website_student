@@ -37,6 +37,8 @@ export async function GET() {
       { date: 'Sun', count: 28 },
     ];
 
+    const recentLeads = await mongoose.connection.db?.collection('leads').find().sort({ createdAt: -1 }).limit(10).toArray();
+
     return NextResponse.json({
       totalUsers,
       totalCommunityPosts,
@@ -44,7 +46,8 @@ export async function GET() {
       userGrowth: newUsersLast30Days,
       activeStudents,
       dailyGrowth,
-      maxDaily: 35
+      maxDaily: 35,
+      recentLeads: recentLeads || []
     }, { status: 200 });
   } catch (error) {
     console.error('[ADMIN_METRICS_ERROR]:', error);

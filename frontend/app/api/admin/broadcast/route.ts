@@ -91,16 +91,31 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const { postId } = await req.json();
+    if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+       return NextResponse.json({ error: 'Invalid Intel Identifier' }, { status: 400 });
+    }
+
     await connectToDatabase();
     
-    if (mongoose.connection.db) {
+    // 1. Terminate the broadcast record
+    // We try both Mongoose and direct collection to be absolutely sure
+    const deletedPost = await Post.findByIdAndDelete(postId);
+    
+    if (!deletedPost && mongoose.connection.db) {
        await mongoose.connection.db.collection('community').deleteOne({ _id: new mongoose.Types.ObjectId(postId) });
-    } else {
-       await Post.findByIdAndDelete(postId);
     }
     
-    return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+    // 2. Cascade: Neutralize associated notification signals
+    try {
+       await Notification.deleteMany({ targetId: postId.toString() });
+    } catch (notifErr) {
+       console.error('[BROADCAST_DELETE_CASCADE_ERROR]', notifErr);
+    }
+    
+    console.log(`[BROADCAST_API_DELETE] Item ${postId} terminated and signals neutralized.`);
+    return NextResponse.json({ success: true, message: 'Institutional record terminated.' }, { status: 200 });
+  } catch (error: any) {
+    console.error('[BROADCAST_API_DELETE_ERROR]', error);
+    return NextResponse.json({ error: 'Termination Failed', details: error.message }, { status: 500 });
   }
 }

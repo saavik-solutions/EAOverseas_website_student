@@ -22,3 +22,16 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: 'Failed to update lead' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { leadId } = await req.json();
+    if (!leadId) return NextResponse.json({ error: 'ID Missing' }, { status: 400 });
+    
+    await connectToDatabase();
+    await Lead.findByIdAndDelete(leadId);
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  }
+}

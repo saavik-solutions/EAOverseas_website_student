@@ -8,7 +8,8 @@ import {
   AlertCircle,
   Loader2,
   Calendar,
-  MoreVertical
+  MoreVertical,
+  Trash2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
@@ -122,31 +123,54 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Network Growth Visualization */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h4 className="text-lg font-bold text-slate-900 tracking-tight">Network Velocity</h4>
-              <p className="text-sm text-slate-500 font-medium">Student acquisition over the last 30 days</p>
-            </div>
-            <button className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors">
-              <MoreVertical className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="h-64 flex items-end justify-between gap-2 pt-4">
-            {metrics?.dailyGrowth?.map((day: any, i: number) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-3">
-                 <div 
-                   className="w-full bg-slate-100 rounded-lg relative group transition-all"
-                   style={{ height: `${(day.count / (metrics.maxDaily || 1)) * 100}%`, minHeight: '4px' }}
-                 >
-                    <div className="absolute inset-x-0 bottom-0 bg-brand-primary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" style={{ height: '100%' }} />
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                       {day.count} New Students
-                    </div>
-                 </div>
-                 <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">{day.date}</span>
-              </div>
-            )) || <div className="w-full h-full flex items-center justify-center text-slate-300 font-bold italic">No telemetry data available for this sector</div>}
-          </div>
+           <div className="flex items-center justify-between mb-8">
+             <div>
+               <h4 className="text-lg font-bold text-slate-900 tracking-tight">Tactical Leads Repository</h4>
+               <p className="text-sm text-slate-500 font-medium">Recent consultation requests and institutional signals.</p>
+             </div>
+             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{metrics?.recentLeads?.length || 0} Recent Payloads</div>
+           </div>
+           
+           <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                 <thead>
+                    <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left">
+                       <th className="pb-4 border-b border-slate-50">Originator</th>
+                       <th className="pb-4 border-b border-slate-50">Topic</th>
+                       <th className="pb-4 border-b border-slate-50 text-right">Ops</th>
+                    </tr>
+                 </thead>
+                 <tbody className="divide-y divide-slate-50">
+                    {metrics?.recentLeads?.length > 0 ? metrics.recentLeads.map((lead: any) => (
+                      <tr key={lead._id} className="group">
+                         <td className="py-4">
+                            <p className="text-xs font-bold text-slate-900">{lead.name}</p>
+                            <p className="text-[10px] text-slate-400">{lead.email}</p>
+                         </td>
+                         <td className="py-4 text-xs font-medium text-slate-500">{lead.serviceRequested || 'Consultation'}</td>
+                         <td className="py-4 text-right">
+                            <button 
+                              onClick={async () => {
+                                if(!confirm('Terminate lead record?')) return;
+                                await fetch('/api/admin/leads', { 
+                                  method: 'DELETE', 
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ leadId: lead._id }) 
+                                });
+                                window.location.reload();
+                              }}
+                              className="p-1.5 hover:bg-rose-50 text-slate-200 hover:text-rose-500 rounded-lg transition-all"
+                            >
+                               <Trash2 className="h-4 w-4" />
+                            </button>
+                         </td>
+                      </tr>
+                    )) : (
+                      <tr><td colSpan={3} className="py-10 text-center text-xs text-slate-300 italic font-bold">No active signals detected.</td></tr>
+                    )}
+                 </tbody>
+              </table>
+           </div>
         </div>
 
         {/* Tactical Feed Monitor */}
