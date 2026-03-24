@@ -39,16 +39,24 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!isClient) return;
 
-    // Skip all logic for authentication pages to avoid loops/hangs
+    // 1. Strict Auth Check
+    if (authStatus === 'unauthenticated') {
+      if (!pathname.startsWith('/auth')) {
+        router.push('/auth/login');
+      }
+      return;
+    }
+
+    // 2. Auth Page Exemption
     if (pathname.startsWith('/auth')) {
       setStatus('passed');
       return;
     }
 
+    // 3. Authenticated Logic
     if (authStatus === 'authenticated' && session?.user) {
       const u = session.user as any;
       
-      // Override if they just joined to prevent session lag loop
       if (hasJoinedJustNow) {
         setStatus('passed');
         return;
@@ -65,17 +73,17 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
       } else {
         setStatus('form');
       }
-    } else if (authStatus === 'unauthenticated') {
-      router.push('/auth/login');
     }
   }, [authStatus, session, isClient, router, pathname, hasJoinedJustNow]);
 
   if (!isClient) return null;
   
-  // Do not show any loading state if unauthenticated to avoid "hangs" on protected pages before redirect
+  // If we're unauthenticated on a protected page, show nothing while we redirect
   if (authStatus === 'unauthenticated' && !pathname.startsWith('/auth')) return null;
 
+  // If we're loading or checking, show the professional spinner
   if (authStatus === 'loading' || status === 'checking') {
+    if (pathname.startsWith('/auth')) return <>{children}</>;
      return (
        <div className="w-full h-[50vh] flex flex-col items-center justify-center space-y-4">
          <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
