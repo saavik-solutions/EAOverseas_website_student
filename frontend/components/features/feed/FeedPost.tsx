@@ -123,44 +123,30 @@ export const FeedPost: React.FC<FeedPostProps> = ({
     e.stopPropagation();
     const url = `${window.location.origin}/feed/global/${id}`;
     
-    const fallbackCopyTextToClipboard = (text: string) => {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      
-      // Avoid scrolling to bottom
-      textArea.style.top = "0";
-      textArea.style.left = "0";
-      textArea.style.position = "fixed";
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
+    // Modern Clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
       try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          setIsCopied(true);
-          setTimeout(() => { setIsCopied(false); setShowShareMenu(false); }, 2000);
-        }
+        await navigator.clipboard.writeText(url);
+        setIsCopied(true);
+        setTimeout(() => { setIsCopied(false); setShowShareMenu(false); }, 2000);
+        return;
       } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
+        console.error('Modern copy failed', err);
       }
-
-      document.body.removeChild(textArea);
-    };
-
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(url);
-      return;
     }
 
+    // Fallback for non-secure or older browsers
     try {
-      await navigator.clipboard.writeText(url);
+      const textArea = document.createElement("textarea");
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
       setIsCopied(true);
       setTimeout(() => { setIsCopied(false); setShowShareMenu(false); }, 2000);
     } catch (err) {
-      console.error('Failed to copy', err);
-      fallbackCopyTextToClipboard(url);
+      console.error('Fallback copy failed', err);
     }
   };
 
@@ -543,7 +529,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({
                          </div>
                          <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                               <span className="text-xs font-black text-text-primary uppercase tracking-wide">{comment.userName || 'Anonymous'}</span>
+                               <span className="text-xs font-black text-text-primary uppercase tracking-wide">{comment.userName || 'Student'}</span>
                                <span className="text-[9px] text-text-muted font-bold uppercase tracking-widest">{new Date(comment.createdAt).toLocaleDateString()}</span>
                             </div>
                             <p className="text-sm text-text-muted leading-relaxed">{comment.text}</p>
