@@ -34,7 +34,7 @@ export default function LoginPage() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 flex justify-center items-center p-6 font-sans selection:bg-purple-500/30">
+    <div className="min-h-screen bg-slate-50 flex justify-center items-center p-6 font-sans selection:bg-brand-primary/30">
       
       {/* Centered Unified Card Layout (Flipped for Login) */}
       <div className="w-full max-w-[1000px] bg-white rounded-[2rem] shadow-2xl flex flex-col lg:flex-row overflow-hidden border border-slate-200">
@@ -45,27 +45,27 @@ export default function LoginPage() {
             
             <div className="space-y-2">
               <h2 className="text-[11px] font-black text-orange-600 uppercase tracking-[0.2em]">Access Hub</h2>
-              <h1 className="text-3xl font-black text-purple-900 tracking-tight">Welcome back inside</h1>
+              <h1 className="text-3xl font-black text-nav-bg tracking-tight">Welcome back inside</h1>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-4">
                 {/* BG White for Elements */}
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-500 group-focus-within:text-purple-600 transition-colors" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-500 group-focus-within:text-brand-primary transition-colors" />
                   <input 
                     type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
                     placeholder="Registered Email"
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-all font-medium shadow-sm"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all font-medium shadow-sm"
                   />
                 </div>
 
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-500 group-focus-within:text-purple-600 transition-colors" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-500 group-focus-within:text-brand-primary transition-colors" />
                   <input 
                     type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
                     placeholder="Access Key (Password)"
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-all font-medium shadow-sm"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all font-medium shadow-sm"
                   />
                 </div>
               </div>
@@ -79,7 +79,7 @@ export default function LoginPage() {
               {/* Major Theme Purple Button */}
               <button 
                 disabled={isLoading}
-                className="w-full bg-purple-600 hover:bg-purple-700 transition-colors py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold group shadow-xl shadow-purple-600/20"
+                className="w-full bg-brand-primary hover:opacity-90 transition-all py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold group shadow-xl shadow-brand-primary/20"
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -97,7 +97,7 @@ export default function LoginPage() {
             <div className="text-center pt-2">
               <p className="text-sm text-slate-500 font-medium">
                 Not inside the network yet? {' '}
-                <Link href="/auth/signup" className="text-orange-600 hover:text-purple-600 transition-colors font-bold">
+                <Link href="/auth/signup" className="text-orange-600 hover:text-brand-primary transition-colors font-bold">
                   Request access
                 </Link>
               </p>
@@ -106,7 +106,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side: Major Purple Theme */}
-        <div className="lg:w-5/12 bg-purple-900 p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden order-1 lg:order-2">
+        <div className="lg:w-5/12 bg-nav-bg p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden order-1 lg:order-2">
           {/* Decorative ambient shape */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-[80px] pointer-events-none" />
           
@@ -115,7 +115,7 @@ export default function LoginPage() {
                <h1 className="text-4xl font-black text-white leading-tight mb-4 tracking-tight">
                  Resume your journey.
                </h1>
-               <p className="text-purple-200 font-medium leading-relaxed opacity-90">
+               <p className="text-brand-primary/20 font-medium leading-relaxed opacity-90">
                  There are thousands of new discussions, algorithm updates, and catalogues waiting for you.
                </p>
             </div>
@@ -143,7 +143,7 @@ const Feature = ({ icon: Icon, title, desc }: any) => (
     </div>
     <div>
       <h3 className="text-base font-bold text-white mb-1">{title}</h3>
-      <p className="text-purple-200 text-sm leading-relaxed opacity-90">{desc}</p>
+      <p className="text-brand-primary/20 text-sm leading-relaxed opacity-90">{desc}</p>
     </div>
   </div>
 )

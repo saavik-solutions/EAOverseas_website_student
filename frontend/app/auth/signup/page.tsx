@@ -74,12 +74,12 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex justify-center items-center p-6 font-sans selection:bg-purple-500/30">
+    <div className="min-h-screen bg-slate-50 flex justify-center items-center p-6 font-sans selection:bg-brand-primary/30">
       
       <div className="w-full max-w-[1100px] bg-white rounded-[2rem] shadow-2xl flex flex-col lg:flex-row overflow-hidden border border-slate-200 min-h-[700px]">
         
-        {/* Left Side: Major Purple Theme */}
-        <div className="lg:w-5/12 bg-purple-900 p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden shrink-0">
+        {/* Left Side: Major Theme */}
+        <div className="lg:w-5/12 bg-nav-bg p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden shrink-0">
           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-[80px] pointer-events-none" />
           
           <div className="relative z-10 space-y-10">
@@ -87,7 +87,7 @@ export default function SignupPage() {
                <h1 className="text-4xl font-black text-white leading-tight mb-4 tracking-tight">
                  Unlock your global potential.
                </h1>
-               <p className="text-purple-200 font-medium leading-relaxed opacity-90">
+               <p className="text-brand-primary/20 font-medium leading-relaxed opacity-90">
                  Join thousands of ambitious students securing admissions to the world's top universities.
                </p>
             </div>
@@ -115,7 +115,7 @@ export default function SignupPage() {
                 >
                   <div className="space-y-2">
                     <h2 className="text-[11px] font-black text-orange-600 uppercase tracking-[0.2em]">Step 1: Your Profile</h2>
-                    <h1 className="text-3xl font-black text-purple-900 tracking-tight">Set up your account</h1>
+                    <h1 className="text-3xl font-black text-nav-bg tracking-tight">Set up your account</h1>
                   </div>
 
                   <form onSubmit={handleSignup} className="space-y-5">
@@ -206,7 +206,7 @@ export default function SignupPage() {
 
                     <button 
                       disabled={isLoading}
-                      className="w-full bg-purple-600 hover:bg-purple-700 transition-colors py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold group shadow-xl shadow-purple-600/20"
+                      className="w-full bg-brand-primary hover:opacity-90 transition-all py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold group shadow-xl shadow-brand-primary/20"
                     >
                       {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify & Complete Profile"}
                     </button>
@@ -226,7 +226,7 @@ export default function SignupPage() {
             <div className="text-center pt-2">
               <p className="text-sm text-slate-500 font-medium">
                 Already part of the network? {' '}
-                <Link href="/auth/login" className="text-orange-600 hover:text-purple-600 transition-colors font-bold">
+                <Link href="/auth/login" className="text-orange-600 hover:text-brand-primary transition-colors font-bold">
                   Identify yourself
                 </Link>
               </p>
@@ -281,7 +281,7 @@ const Feature = ({ icon: Icon, title, desc }: any) => (
     </div>
     <div>
       <h3 className="text-base font-bold text-white mb-1">{title}</h3>
-      <p className="text-purple-200 text-sm leading-relaxed opacity-90">{desc}</p>
+      <p className="text-brand-primary/20 text-sm leading-relaxed opacity-90">{desc}</p>
     </div>
   </div>
 );

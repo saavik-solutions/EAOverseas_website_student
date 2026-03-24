@@ -10,14 +10,14 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          primary: "#7C3AED", // Purple 600 - Updated from Indigo
-          accent: "#D946EF",  // Fuchsia 500
+          primary: "#D946EF", // Fuchsia 500 (New Primary)
+          accent: "#7C3AED",  // Purple 600 (Moved to Accent)
           success: "#10B981",
           warning: "#F59E0B",
           danger: "#EF4444",
         },
         nav: {
-          bg: "#2E1065", // Purple 950 - Deep complementary tone
+          bg: "#3B1A7D", // Lightened deep purple-indigo
         },
         bg: {
           base: "#F9FAFB",

@@ -38,7 +38,7 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
             <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-sm">
               EA
             </div>
-            <span className="text-slate-900 font-bold tracking-tight text-sm">Overseas <span className="text-slate-400 font-medium">Admin</span></span>
+            <span className="text-slate-900 font-bold tracking-tight text-sm">Overseas <span className="text-brand-primary font-black italic">Admin</span></span>
           </Link>
         </div>
 
