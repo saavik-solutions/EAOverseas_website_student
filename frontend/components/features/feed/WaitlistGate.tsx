@@ -32,10 +32,8 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!isClient) return;
 
-    if (authStatus === 'unauthenticated') {
-      router.push('/auth/login?callbackUrl=/feed');
-      return;
-    }
+    // Removed client-side redirect to prevent competition with middleware-driven auth protection.
+    // Auth status is now primarily handled by the server-side middleware and DashboardLayout.
 
     if (authStatus === 'authenticated' && session?.user) {
       if (session.user.role === 'admin' || session.user.onboardingCompleted) {
