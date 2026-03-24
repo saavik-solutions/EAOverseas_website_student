@@ -19,10 +19,11 @@ export default auth((req) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 2. Redirect away from login if already authenticated
-  if (isAuth && isAuthPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
+  // 2. Disabled: Redirect away from login if already authenticated
+  // This was causing infinite loops in environments with flaky session hydration.
+  // if (isAuth && isAuthPage) {
+  //   return NextResponse.redirect(new URL("/dashboard", req.url));
+  // }
 
   // 3. Redirect away from onboarding if already completed
   if (isAuth && pathname === "/onboarding" && (req.auth?.user as any)?.onboardingCompleted) {
