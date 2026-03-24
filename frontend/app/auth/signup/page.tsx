@@ -85,7 +85,7 @@ export default function SignupPage() {
                <h1 className="text-4xl font-black text-white leading-tight mb-4 tracking-tight">
                  Unlock your global potential.
                </h1>
-               <p className="text-brand-primary/20 font-medium leading-relaxed opacity-90">
+               <p className="text-white/60 font-medium leading-relaxed">
                  Join thousands of ambitious students securing admissions to the world's top universities.
                </p>
             </div>
@@ -262,7 +262,7 @@ const Feature = ({ icon: Icon, title, desc }: any) => (
     </div>
     <div>
       <h3 className="text-base font-bold text-white mb-1">{title}</h3>
-      <p className="text-brand-primary/20 text-sm leading-relaxed opacity-90">{desc}</p>
+      <p className="text-white/60 text-sm leading-relaxed">{desc}</p>
     </div>
   </div>
 );
