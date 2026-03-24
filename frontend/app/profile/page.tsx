@@ -18,6 +18,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ComingSoonGate } from '@/components/ui/ComingSoonGate';
 
+// Triggering a fresh build to ensure the Coming Soon wall is deployed.
 const TABS = [
   { id: 'Overview', icon: Info },
   { id: 'Academic', icon: History },
