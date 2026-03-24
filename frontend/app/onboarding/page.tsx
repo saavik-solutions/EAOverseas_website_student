@@ -125,7 +125,7 @@ export default function OnboardingPage() {
   });
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: session, status: authStatus } = useSession();
+  const { data: session, status: authStatus, update } = useSession();
   
   // Auto-detect if user is already logged in and onboarded
   useEffect(() => {
@@ -270,6 +270,8 @@ export default function OnboardingPage() {
              localStorage.setItem('pai_analysis', JSON.stringify(data.user.paiAnalysis));
           }
         }
+        // Force session update to reflect onboarding completion
+        await update({ onboardingCompleted: true });
       }
       // Redirect happens in onComplete callback of AIAnalyzingScreen
     } catch (error) {

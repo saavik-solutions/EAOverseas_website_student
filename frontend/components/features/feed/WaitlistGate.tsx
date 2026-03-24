@@ -41,10 +41,13 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
 
     // 1. Strict Auth Check
     if (authStatus === 'unauthenticated') {
-      if (!pathname.startsWith('/auth')) {
-        router.push('/auth/login');
-      }
-      return;
+      // Small buffer to prevent transient unauthenticated states during fast navigation
+      const timeout = setTimeout(() => {
+        if (authStatus === 'unauthenticated' && !pathname.startsWith('/auth')) {
+          router.push('/auth/login');
+        }
+      }, 500);
+      return () => clearTimeout(timeout);
     }
 
     // 2. Auth Page Exemption
