@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, Briefcase, DollarSign, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface Props {
   children: React.ReactNode;
@@ -13,6 +13,7 @@ interface Props {
 export const WaitlistGate: React.FC<Props> = ({ children }) => {
   const { data: session, status: authStatus, update } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   
   const [isClient, setIsClient] = useState(false);
   const [status, setStatus] = useState<'checking' | 'form' | 'success' | 'passed'>('checking');
@@ -24,9 +25,14 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
     futurePlans: '',
     budget: '',
   });
+  const [waitlistCount, setWaitlistCount] = useState<number>(751);
 
   useEffect(() => {
     setIsClient(true);
+    fetch('/api/user/waitlist-count')
+      .then(res => res.json())
+      .then(data => { if (data.success) setWaitlistCount(data.count); })
+      .catch(err => console.error("Failed to fetch waitlist count.", err));
   }, []);
 
   useEffect(() => {
@@ -36,13 +42,21 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
     // Auth status is now primarily handled by the server-side middleware and DashboardLayout.
 
     if (authStatus === 'authenticated' && session?.user) {
-      if (session.user.role === 'admin' || session.user.onboardingCompleted) {
+      const u = session.user as any;
+      if (u.role === 'admin' || (u.isWaitlistJoined && u.onboardingCompleted)) {
         setStatus('passed');
+      } else if (u.isWaitlistJoined && !u.onboardingCompleted) {
+        // Already waitlisted but haven't finished full onboarding
+        if (pathname !== '/onboarding') {
+          router.push('/onboarding');
+        } else {
+          setStatus('passed'); // Let them see the onboarding page
+        }
       } else {
         setStatus('form');
       }
     }
-  }, [authStatus, session, isClient, router]);
+  }, [authStatus, session, isClient, router, pathname]);
 
   if (!isClient || authStatus === 'loading' || status === 'checking') {
      return null;
@@ -61,14 +75,14 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
       await fetch('/api/user/onboarding', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ ...formData, isWaitlistJoined: true, onboardingCompleted: false })
       });
-      // Force NextAuth to pull the new token variables
-      await update({ onboardingCompleted: true });
-      setStatus('passed');
+      // Refresh session to pick up isWaitlistJoined
+      await update();
+      router.push('/onboarding');
     } catch (e) {
       console.error("Failed to save onboarding.", e);
-      setStatus('passed'); // Fallback lets them in but DB might block features later
+      router.push('/onboarding');
     }
   };
 
@@ -194,7 +208,7 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5, type: 'spring' }}
                      >
-                       751
+                       {waitlistCount}
                      </motion.span>
                   </div>
                </div>
@@ -203,7 +217,7 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
                  onClick={completeAndEnter}
                  className="w-full py-4 bg-text-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-colors"
                >
-                 Enter Preview Feed
+                 Continue to Profile Audit
                </button>
              </div>
           </motion.div>

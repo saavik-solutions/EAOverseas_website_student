@@ -19,7 +19,7 @@ export async function PUT(req: Request) {
     const updatedUser = await User.findByIdAndUpdate(
       session.user.id,
       {
-        onboardingCompleted: true,
+        onboardingCompleted: body.onboardingCompleted ?? false,
         onboardingData: body,
         fullName: body.fullName || session.user.name,
         gender: body.gender,
