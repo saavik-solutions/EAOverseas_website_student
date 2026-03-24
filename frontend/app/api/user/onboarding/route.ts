@@ -39,6 +39,7 @@ export async function PUT(req: Request) {
         toeflScore: body.toeflScore,
         greScore: body.greScore,
         gmatScore: body.gmatScore,
+        paiAnalysis: body.paiAnalysis,
         isWaitlistJoined: true,
         waitlistNumber: (await User.countDocuments()) + 755,
       },

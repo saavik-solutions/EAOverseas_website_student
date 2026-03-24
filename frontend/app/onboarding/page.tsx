@@ -257,7 +257,8 @@ export default function OnboardingPage() {
         body: JSON.stringify({
           ...form,
           onboardingCompleted: true,
-          onboardingData: form
+          onboardingData: form,
+          paiAnalysis: auditData?.analysis
         })
       });
 

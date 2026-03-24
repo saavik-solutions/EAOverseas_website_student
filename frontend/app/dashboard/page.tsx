@@ -3,7 +3,7 @@
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { ProfileScoreRing } from '@/components/features/ProfileScoreRing';
 import { ComparisonReport } from '@/components/features/ComparisonReport';
-import { AINextSteps } from '@/components/features/AINextSteps';
+import { PAIHelpChat } from '@/components/features/PAIHelpChat';
 import { PAIWidget } from '@/components/features/PAIWidget';
 import { GraduationCap, DollarSign, ArrowRight, MessageSquare, Calendar, Globe, Sparkles, Target, Loader2, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -136,7 +136,7 @@ export default function DashboardPage() {
 
           {/* Side Intelligence Column */}
           <motion.div variants={item} className="space-y-8">
-            <AINextSteps />
+            <PAIHelpChat paiAnalysis={analysis} />
             
             <div className="card-premium p-6 bg-nav-bg text-white border-2 border-brand-accent/30 overflow-hidden relative group">
               <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand-accent/10 rounded-full blur-3xl group-hover:bg-brand-accent/20 transition-all" />
