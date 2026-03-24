@@ -39,8 +39,11 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!isClient) return;
 
-    // Removed client-side redirect to prevent competition with middleware-driven auth protection.
-    // Auth status is now primarily handled by the server-side middleware and DashboardLayout.
+    // Skip all logic for authentication pages to avoid loops/hangs
+    if (pathname.startsWith('/auth')) {
+      setStatus('passed');
+      return;
+    }
 
     if (authStatus === 'authenticated' && session?.user) {
       const u = session.user as any;

@@ -10,7 +10,7 @@ export default auth((req) => {
 
   const isAuthPage = pathname.startsWith("/auth");
   const isApiAuthPage = pathname.startsWith("/api/auth");
-  const isPublicPage = pathname === "/" || isAuthPage || isApiAuthPage;
+  const isPublicPage = pathname === "/" || isAuthPage || isApiAuthPage || pathname.startsWith("/images") || pathname.startsWith("/icons");
 
   // 1. Protect all non-public pages
   if (!isAuth && !isPublicPage) {
