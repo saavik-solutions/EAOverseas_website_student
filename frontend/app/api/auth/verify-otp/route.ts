@@ -1,3 +1,7 @@
+import { NextResponse } from 'next/server';
+import connectToDatabase from '@/lib/db/mongodb';
+import { User } from '@/lib/db/models/User';
+import { PendingUser } from '@/lib/db/models/PendingUser';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
