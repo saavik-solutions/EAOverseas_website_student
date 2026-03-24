@@ -63,14 +63,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
           token.id = user.id;
           token.role = user.role;
-          token.fullName = user.name; // Use user.name from authorize return
+          token.fullName = user.name;
           token.detailedFilled = user.detailedFilled;
           token.state = user.state;
       } else if (trigger === "update" && session) {
-          // Update token from session if session.update() is called
-          token.fullName = session.user.fullName || token.fullName;
-          token.detailedFilled = session.user.detailedFilled !== undefined ? session.user.detailedFilled : token.detailedFilled;
-          token.state = session.user.state !== undefined ? session.user.state : token.state;
+          // Robust update handling for both payload structures
+          const data = session.user || session;
+          if (data.fullName) token.fullName = data.fullName;
+          if (data.detailedFilled !== undefined) token.detailedFilled = data.detailedFilled;
+          if (data.state !== undefined) token.state = data.state;
       }
       return token;
     }

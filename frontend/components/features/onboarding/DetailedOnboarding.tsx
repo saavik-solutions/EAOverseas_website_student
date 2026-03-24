@@ -94,14 +94,14 @@ export default function DetailedOnboarding({ onComplete, onClose }: DetailedOnbo
                             <button 
                                 type="submit"
                                 disabled={isLoading}
-                                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-200"
+                                className="flex-1 bg-brand-primary hover:opacity-90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-primary/20"
                             >
                                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Save Profile <ArrowRight className="w-5 h-5" /></>}
                             </button>
                             <button 
                                 type="button"
                                 onClick={onClose}
-                                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-4 rounded-xl transition-all"
+                                className="flex-1 bg-bg-base hover:bg-slate-200 text-text-muted font-bold py-4 rounded-xl transition-all"
                             >
                                 Skip for now
                             </button>
@@ -115,23 +115,23 @@ export default function DetailedOnboarding({ onComplete, onClose }: DetailedOnbo
 
 const Input = ({ icon: Icon, value, onChange, ...props }: any) => (
     <div className="relative group">
-        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-500 transition-colors" />
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-primary transition-colors" />
         <input 
             {...props}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-all font-medium text-sm shadow-sm"
+            className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-border bg-white text-text-primary focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all font-medium text-sm shadow-sm"
         />
     </div>
 );
 
 const Select = ({ icon: Icon, value, onChange, options, placeholder }: any) => (
     <div className="relative group">
-        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-500 transition-colors pointer-events-none" />
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-primary transition-colors pointer-events-none" />
         <select 
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-all font-medium text-sm shadow-sm appearance-none"
+            className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-border bg-white text-text-primary focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all font-medium text-sm shadow-sm appearance-none"
         >
             <option value="" disabled>{placeholder}</option>
             {options.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
