@@ -16,33 +16,46 @@ export async function PUT(req: Request) {
     await connectToDatabase();
 
     // Securely update the user with the full onboarding data
+    const updateData: any = {
+      onboardingCompleted: body.onboardingCompleted ?? false,
+      onboardingData: body,
+      fullName: body.fullName || session.user.name,
+      gender: body.gender,
+      phone: body.phone,
+      nationality: body.nationality,
+      dob: body.dob ? new Date(body.dob) : undefined,
+      experience: body.experience || [],
+      targetCountries: body.targetCountries || [],
+      targetCourses: body.targetCourses ? [body.targetCourses] : [],
+      targetDegree: body.targetDegree,
+      specialization: body.specialization,
+      budget: body.budget,
+      intakeYear: body.intakeYear,
+      intakeSemester: body.intakeSemester,
+      ieltsScore: body.ieltsScore,
+      toeflScore: body.toeflScore,
+      greScore: body.greScore,
+      gmatScore: body.gmatScore,
+      paiAnalysis: body.paiAnalysis,
+      isWaitlistJoined: true,
+      waitlistNumber: (await User.countDocuments({ isWaitlistJoined: true })) + 755,
+    };
+
+    // Normalize education to array of objects
+    if (body.education) {
+      updateData.education = typeof body.education === 'string'
+        ? [{ level: body.education, degree: '', institution: '', score: '', year: '' }]
+        : body.education;
+    }
+
+    // Preserve futurePlans if sent
+    if (body.futurePlans) {
+      updateData.futurePlans = body.futurePlans;
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       session.user.id,
-      {
-        onboardingCompleted: body.onboardingCompleted ?? false,
-        onboardingData: body,
-        fullName: body.fullName || session.user.name,
-        gender: body.gender,
-        phone: body.phone,
-        nationality: body.nationality,
-        dob: body.dob ? new Date(body.dob) : undefined,
-        education: body.education || [],
-        experience: body.experience || [],
-        targetCountries: body.targetCountries || [],
-        targetCourses: body.targetCourses ? [body.targetCourses] : [],
-        targetDegree: body.targetDegree,
-        specialization: body.specialization,
-        budget: body.budget,
-        intakeYear: body.intakeYear,
-        intakeSemester: body.intakeSemester,
-        ieltsScore: body.ieltsScore,
-        toeflScore: body.toeflScore,
-        greScore: body.greScore,
-        gmatScore: body.gmatScore,
-        paiAnalysis: body.paiAnalysis,
-        isWaitlistJoined: true,
-        waitlistNumber: (await User.countDocuments()) + 755,
-      },
+      updateData,
       { new: true }
     );
 

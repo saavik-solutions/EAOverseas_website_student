@@ -13,8 +13,10 @@ export const authConfig = {
         token.waitlistNumber = user.waitlistNumber;
         token.isWaitlistJoined = user.isWaitlistJoined;
       }
-      if (trigger === "update" && session?.onboardingCompleted !== undefined) {
-         token.onboardingCompleted = session.onboardingCompleted;
+      if (trigger === "update") {
+         if (session?.onboardingCompleted !== undefined) token.onboardingCompleted = session.onboardingCompleted;
+         if (session?.isWaitlistJoined !== undefined) token.isWaitlistJoined = session.isWaitlistJoined;
+         if (session?.waitlistNumber !== undefined) token.waitlistNumber = session.waitlistNumber;
       }
       return token;
     },

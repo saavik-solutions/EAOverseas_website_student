@@ -95,23 +95,34 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
   if (status === 'passed') return <>{children}</>;
 
   const handleNext = () => setStep(s => s + 1);
-  const handleSubmit = () => {
-    setStatus('success');
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch('/api/user/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      setWaitlistCount(data.count || 1234);
+      setStatus('success');
+      
+      // Refresh session to pick up isWaitlistJoined status immediately
+      await update({ 
+        isWaitlistJoined: true, 
+        waitlistNumber: data.count 
+      });
+    } catch (e) {
+      console.error("Waitlist error:", e);
+      setStatus('success');
+    }
   };
 
   const completeAndEnter = async () => {
     try {
-      await fetch('/api/user/onboarding', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, isWaitlistJoined: true, onboardingCompleted: false })
-      });
-      // Refresh session to pick up isWaitlistJoined
-      await update();
-      setHasJoinedJustNow(true);
+      // Transition to onboarding
       router.push('/onboarding');
     } catch (e) {
-      console.error("Failed to save onboarding.", e);
+      console.error("Failed to redirect.", e);
       router.push('/onboarding');
     }
   };
