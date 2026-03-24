@@ -46,17 +46,12 @@ export async function POST(request: Request) {
       passwordHash: pendingUser.passwordHash,
       role: pendingUser.role,
       phone: pendingUser.phone,
-      targetCountries: pendingUser.targetCountries,
-      targetDegree: pendingUser.targetDegree,
-      intakeYear: pendingUser.intakeYear,
-      intakeSemester: pendingUser.intakeSemester,
-      budget: pendingUser.budget,
-      highestEducation: pendingUser.highestEducation,
-      preferredCourse: pendingUser.preferredCourse,
+      state: pendingUser.state,
       isEmailVerified: true,
       isWaitlistJoined: true,
       waitlistNumber,
-      onboardingCompleted: true
+      onboardingCompleted: false,
+      detailedFilled: false
     });
 
     // Delete PendingUser

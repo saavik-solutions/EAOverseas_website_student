@@ -64,6 +64,8 @@ export interface IUser extends Document {
     otp?: string;
     otpExpires?: Date;
     highestEducation?: string;
+    state?: string;
+    detailedFilled: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -107,6 +109,8 @@ const UserSchema: Schema = new Schema(
         otp: { type: String },
         otpExpires: { type: Date },
         highestEducation: { type: String },
+        state: { type: String },
+        detailedFilled: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

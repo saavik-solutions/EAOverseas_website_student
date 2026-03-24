@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { WaitlistGate } from '@/components/features/feed/WaitlistGate';
 import { NotificationManager } from '@/components/features/NotificationManager';
+import ProfileCompletionPrompt from '@/components/ui/ProfileCompletionPrompt';
 
 export default function DashboardLayout({
   children,
@@ -26,6 +27,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-bg-base">
       <NotificationManager />
+      <ProfileCompletionPrompt />
       
       {/* Global Sidebar */}
       <Sidebar 

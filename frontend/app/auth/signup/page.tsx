@@ -11,9 +11,7 @@ export default function SignupPage() {
   const [step, setStep] = useState(1); // 1: Lead Info & Account, 2: OTP Verification
   const [formData, setFormData] = useState({ 
     fullName: '', email: '', password: '', 
-    phone: '', targetCountries: '', targetDegree: '', 
-    intakeYear: '2025', intakeSemester: 'Fall', budget: '', 
-    highestEducation: '', preferredCourse: '' 
+    phone: '', state: ''
   });
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -118,8 +116,8 @@ export default function SignupPage() {
                     <h1 className="text-3xl font-black text-nav-bg tracking-tight">Set up your account</h1>
                   </div>
 
-                  <form onSubmit={handleSignup} className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <form onSubmit={handleSignup} className="space-y-5">
+                    <div className="grid grid-cols-1 gap-4">
                       {/* Name */}
                       <Input icon={User} type="text" placeholder="Full Legal Name" value={formData.fullName} 
                         onChange={(val: string) => setFormData({...formData, fullName: val})} required />
@@ -128,42 +126,25 @@ export default function SignupPage() {
                       <Input icon={Mail} type="email" placeholder="Email Address" value={formData.email} 
                         onChange={(val: string) => setFormData({...formData, email: val})} required />
 
-                      {/* Phone */}
-                      <Input icon={Phone} type="tel" placeholder="Contact Number" value={formData.phone} 
+                      {/* Phone / WhatsApp */}
+                      <Input icon={Phone} type="tel" placeholder="WhatsApp Number" value={formData.phone} 
                         onChange={(val: string) => setFormData({...formData, phone: val})} required />
 
                       {/* Password */}
                       <Input icon={Lock} type="password" placeholder="Secure Password" value={formData.password} 
                         onChange={(val: string) => setFormData({...formData, password: val})} required />
 
-                      {/* Education Level */}
-                      <Select icon={GraduationCap} placeholder="Highest Education" value={formData.highestEducation} 
-                        onChange={(val: string) => setFormData({...formData, highestEducation: val})}
-                        options={['12th Grade', 'Bachelor\'s Degree', 'Master\'s Degree', 'Diploma']} required />
-
-                      {/* Preferred Course */}
-                      <Input icon={BookOpen} type="text" placeholder="Preferred Course" value={formData.preferredCourse} 
-                        onChange={(val: string) => setFormData({...formData, preferredCourse: val})} required />
-
-                      {/* Target Country */}
-                      <Select icon={MapPin} placeholder="Target Country" value={formData.targetCountries} 
-                        onChange={(val: string) => setFormData({...formData, targetCountries: val})}
-                        options={['UK', 'USA', 'Canada', 'Australia', 'Germany', 'Ireland']} required />
-
-                      {/* Target Degree */}
-                      <Select icon={Target} placeholder="Target Degree" value={formData.targetDegree} 
-                        onChange={(val: string) => setFormData({...formData, targetDegree: val})}
-                        options={['Bachelor\'s', 'Master\'s', 'PhD', 'MBA']} required />
-
-                      {/* Intake Semester */}
-                      <Select icon={Calendar} placeholder="Intake Semester" value={formData.intakeSemester} 
-                        onChange={(val: string) => setFormData({...formData, intakeSemester: val})}
-                        options={['Fall', 'Spring', 'Summer']} required />
-
-                      {/* Budget */}
-                      <Select icon={Wallet} placeholder="Budget Range" value={formData.budget} 
-                        onChange={(val: string) => setFormData({...formData, budget: val})}
-                        options={['Below 10L', '10L - 25L', '25L - 50L', 'Above 50L']} required />
+                      {/* State */}
+                      <Select icon={MapPin} placeholder="Your State" value={formData.state} 
+                        onChange={(val: string) => setFormData({...formData, state: val})}
+                        options={[
+                          'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 
+                          'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 
+                          'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 
+                          'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
+                          'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+                          'Delhi', 'Jammu and Kashmir', 'Ladakh'
+                        ]} required />
                     </div>
 
                     {error && <ErrorMsg msg={error} />}

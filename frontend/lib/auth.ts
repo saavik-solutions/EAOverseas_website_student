@@ -40,10 +40,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           onboardingCompleted: user.onboardingCompleted || false,
           waitlistNumber: user.waitlistNumber,
-          isWaitlistJoined: user.isWaitlistJoined
+          isWaitlistJoined: user.isWaitlistJoined,
+          // Add detailedFilled and state from user object if they exist
+          detailedFilled: user.detailedFilled || false,
+          state: user.state || null,
         };
       }
     })
   ],
+  callbacks: {
+    async session({ session, token }: any) {
+      if (token) {
+          session.user.id = token.id;
+          session.user.role = token.role;
+          session.user.fullName = token.fullName;
+          session.user.detailedFilled = token.detailedFilled;
+          session.user.state = token.state;
+      }
+      return session;
+    },
+    async jwt({ token, user, trigger, session }: any) {
+      if (user) {
+          token.id = user.id;
+          token.role = user.role;
+          token.fullName = user.name; // Use user.name from authorize return
+          token.detailedFilled = user.detailedFilled;
+          token.state = user.state;
+      } else if (trigger === "update" && session) {
+          // Update token from session if session.update() is called
+          token.fullName = session.user.fullName || token.fullName;
+          token.detailedFilled = session.user.detailedFilled !== undefined ? session.user.detailedFilled : token.detailedFilled;
+          token.state = session.user.state !== undefined ? session.user.state : token.state;
+      }
+      return token;
+    }
+  },
   debug: process.env.NODE_ENV === "development",
 });

@@ -7,6 +7,8 @@ export interface IUser extends Document {
     avatarUrl?: string;
     role: 'student' | 'admin' | 'counsellor' | 'employee';
     onboardingCompleted: boolean;
+    state?: string;
+    detailedFilled: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -19,6 +21,8 @@ const UserSchema: Schema = new Schema(
         avatarUrl: { type: String },
         role: { type: String, enum: ['student', 'admin', 'counsellor', 'employee'], default: 'student' },
         onboardingCompleted: { type: Boolean, default: false },
+        state: { type: String },
+        detailedFilled: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

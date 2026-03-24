@@ -13,6 +13,7 @@ export interface IPendingUser extends Document {
     budget?: string;
     highestEducation?: string;
     preferredCourse?: string;
+    state?: string;
     otp: string;
     otpExpires: Date;
     createdAt: Date;
@@ -33,6 +34,7 @@ const PendingUserSchema: Schema = new Schema(
         budget: { type: String },
         highestEducation: { type: String },
         preferredCourse: { type: String },
+        state: { type: String },
         otp: { type: String, required: true },
         otpExpires: { type: Date, required: true },
     },

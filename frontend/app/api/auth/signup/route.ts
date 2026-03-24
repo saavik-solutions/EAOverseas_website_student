@@ -18,9 +18,7 @@ export async function POST(request: Request) {
     await connectToDatabase();
     const { 
       fullName, email, password, role, 
-      phone, targetCountries, targetDegree, 
-      intakeYear, intakeSemester, budget, 
-      highestEducation, preferredCourse 
+      phone, state
     } = await request.json();
 
     if (!fullName || !email || !password) {
@@ -45,13 +43,7 @@ export async function POST(request: Request) {
         passwordHash,
         role: role || 'student',
         phone,
-        targetCountries,
-        targetDegree,
-        intakeYear,
-        intakeSemester,
-        budget,
-        highestEducation,
-        preferredCourse,
+        state,
         otp,
         otpExpires,
       },
