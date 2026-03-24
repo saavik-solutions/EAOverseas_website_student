@@ -22,8 +22,8 @@ export default function LoginPage() {
       if (result?.error) {
         setError("Invalid secure credentials.");
       } else {
-        router.push('/feed');
         router.refresh();
+        router.push('/feed');
       }
     } catch (err) {
       setError("An unexpected network error occurred.");
