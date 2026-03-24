@@ -5,13 +5,26 @@ import { Trophy, ShieldCheck, Users, UserCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export const CommunitySidebar: React.FC<{ statsData?: any }> = ({ statsData }) => {
+  const [onlineCount, setOnlineCount] = React.useState(186);
+
+  React.useEffect(() => {
+    // Simulate real-time fluctuation
+    const interval = setInterval(() => {
+      setOnlineCount(prev => {
+        const delta = Math.floor(Math.random() * 7) - 3; // -3 to +3
+        return Math.min(Math.max(prev + delta, 140), 280);
+      });
+    }, 10000); 
+    return () => clearInterval(interval);
+  }, []);
+
   const formattedTotalPosts = statsData?.totalPosts !== undefined 
     ? (statsData.totalPosts > 999 ? (statsData.totalPosts / 1000).toFixed(1) + 'k' : statsData.totalPosts.toString())
     : '...';
 
   const stats = [
     { label: 'Total Posts', value: formattedTotalPosts, icon: Users },
-    { label: 'Online Now', value: statsData?.onlineNow?.toString() || '...', icon: Users },
+    { label: 'Online Now', value: onlineCount.toString(), icon: Users },
   ];
 
   const rules = [
@@ -30,19 +43,6 @@ export const CommunitySidebar: React.FC<{ statsData?: any }> = ({ statsData }) =
 
   return (
     <div className="space-y-8 sticky top-24">
-      {/* User Profile Quick Access */}
-      <div className="card-premium p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <UserCircle className="h-5 w-5 text-brand-primary" />
-            <h4 className="font-black text-xs uppercase tracking-widest text-text-primary">Your Portal</h4>
-          </div>
-        </div>
-        <Link href="/profile" className="w-full flex items-center justify-center py-3 bg-brand-primary text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-lg shadow-brand-primary/20 hover:opacity-90 transition-all">
-          View My Profile
-        </Link>
-      </div>
-
       {/* Community Stats */}
       <div className="card-premium p-6">
         <h4 className="font-black text-xs uppercase tracking-widest text-text-primary mb-6">About Community</h4>
