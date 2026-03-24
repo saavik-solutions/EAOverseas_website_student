@@ -32,10 +32,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleAnonymousLogin = async () => {
-    setIsLoading(true);
-    await signIn('credentials', { isAnonymous: 'true', callbackUrl: '/feed' });
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex justify-center items-center p-6 font-sans selection:bg-purple-500/30">
@@ -97,14 +93,6 @@ export default function LoginPage() {
 
             </form>
 
-            <button 
-              type="button"
-              onClick={handleAnonymousLogin}
-              disabled={isLoading}
-              className="w-full bg-slate-100 hover:bg-slate-200 transition-colors py-4 rounded-xl flex items-center justify-center gap-2 text-slate-700 font-bold hover:text-slate-900"
-            >
-              Explore Anonymously
-            </button>
 
             <div className="text-center pt-2">
               <p className="text-sm text-slate-500 font-medium">
