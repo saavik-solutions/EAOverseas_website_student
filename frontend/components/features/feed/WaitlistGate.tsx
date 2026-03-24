@@ -40,23 +40,13 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
     if (!isClient) return;
 
     // 1. Strict Auth Check
-    if (authStatus === 'unauthenticated') {
-      // Small buffer to prevent transient unauthenticated states during fast navigation
-      const timeout = setTimeout(() => {
-        if (authStatus === 'unauthenticated' && !pathname.startsWith('/auth')) {
-          router.push('/auth/login');
-        }
-      }, 3000);
-      return () => clearTimeout(timeout);
-    }
-
-    // 2. Auth Page Exemption
+    // 1. Auth Page Exemption
     if (pathname.startsWith('/auth')) {
       setStatus('passed');
       return;
     }
 
-    // 3. Authenticated Logic
+    // 2. Authenticated Logic
     if (authStatus === 'authenticated' && session?.user) {
       const u = session.user as any;
       
@@ -65,17 +55,8 @@ export const WaitlistGate: React.FC<Props> = ({ children }) => {
         return;
       }
 
-      if (u.role === 'admin' || (u.isWaitlistJoined && u.onboardingCompleted)) {
-        setStatus('passed');
-      } else if (u.isWaitlistJoined && !u.onboardingCompleted) {
-        if (pathname !== '/onboarding') {
-          router.push('/onboarding');
-        } else {
-          setStatus('passed');
-        }
-      } else {
-        setStatus('form');
-      }
+      // Bypass everything since onboarding is now part of signup
+      setStatus('passed');
     }
   }, [authStatus, session, isClient, router, pathname, hasJoinedJustNow]);
 

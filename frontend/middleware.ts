@@ -25,10 +25,7 @@ export default auth((req) => {
   //   return NextResponse.redirect(new URL("/dashboard", req.url));
   // }
 
-  // 3. Redirect away from onboarding if already completed
-  if (isAuth && pathname === "/onboarding" && (req.auth?.user as any)?.onboardingCompleted) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
+  // 3. Removed: Redirect away from onboarding (not used anymore)
 
   return NextResponse.next();
 });

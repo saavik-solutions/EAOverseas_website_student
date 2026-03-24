@@ -39,10 +39,11 @@ export default function DashboardPage() {
             }
           }
         } else if (res.status === 401) {
-          // Session expired or invalid, clear everything
-          localStorage.removeItem('pai_profile');
-          localStorage.removeItem('pai_analysis');
-          router.push('/auth/login');
+          console.warn("Unauthorized API call in dashboard. User might not be fully logged in yet.");
+          // Don't hard redirect here, let middleware or manual login handle it.
+          // Fallback to localStorage if available
+          const rawProfile = localStorage.getItem('pai_profile');
+          if (rawProfile) setProfile(JSON.parse(rawProfile));
         } else {
           // Fallback to localStorage for instant feel or offline mode
           const rawProfile = localStorage.getItem('pai_profile');
@@ -76,7 +77,18 @@ export default function DashboardPage() {
         <div className="max-w-4xl mx-auto pt-8 px-4">
           <div className="mb-8">
             <h1 className="text-3xl font-black text-text-primary mb-2">Welcome to EAOverseas! 🎓</h1>
-            <p className="text-text-muted font-medium">To get started, please complete your profile audit to unlock personalized insights.</p>
+            <p className="text-text-muted font-medium mb-4">To get started, please complete your profile audit to unlock personalized insights.</p>
+            {profile?.waitlistNumber && (
+              <div className="inline-flex items-center gap-3 px-6 py-4 bg-orange-500/10 rounded-2xl border border-orange-500/20">
+                <div className="h-10 w-10 rounded-xl bg-orange-500 flex items-center justify-center text-white font-black text-xl">
+                  #{profile.waitlistNumber}
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-orange-600">Your Waitlist Position</p>
+                  <p className="text-sm font-bold text-text-primary">You are early! Accessing global seats soon.</p>
+                </div>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <PAIWidget />
@@ -112,6 +124,11 @@ export default function DashboardPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-full border border-brand-primary/20 text-brand-primary text-[10px] font-black uppercase tracking-widest mb-2">
               <Sparkles className="h-3 w-3" /> Profile Status: Analytics Unlocked
             </div>
+            {profile?.waitlistNumber && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/10 rounded-full border border-orange-500/20 text-orange-600 text-[10px] font-black uppercase tracking-widest mb-2 ml-2">
+                <Target className="h-3 w-3" /> Waitlist: #{profile.waitlistNumber}
+              </div>
+            )}
             <h1 className="text-4xl font-black text-text-primary tracking-tight">
               Hello, <span className="text-brand-primary">{profile?.fullName?.split(' ')[0] || 'Student'}</span> 👋
             </h1>

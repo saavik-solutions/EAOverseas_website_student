@@ -60,9 +60,10 @@ export interface IUser extends Document {
     isWaitlistJoined: boolean;
     waitlistNumber?: number;
     futurePlans?: string;
-    isLocked: boolean;
-    resumeText?: string;
-    savedPosts?: mongoose.Schema.Types.ObjectId[];
+    isEmailVerified: boolean;
+    otp?: string;
+    otpExpires?: Date;
+    highestEducation?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -102,6 +103,10 @@ const UserSchema: Schema = new Schema(
         isLocked: { type: Boolean, default: false },
         resumeText: { type: String },
         savedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
+        isEmailVerified: { type: Boolean, default: false },
+        otp: { type: String },
+        otpExpires: { type: Date },
+        highestEducation: { type: String },
     },
     { timestamps: true }
 );
