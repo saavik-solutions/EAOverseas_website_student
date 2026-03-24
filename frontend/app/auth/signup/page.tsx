@@ -144,19 +144,16 @@ export default function SignupPage() {
                 )}
               </button>
 
-              <button 
-                type="button"
-                onClick={handleAnonymousLogin}
-                disabled={isLoading}
-                className="w-full bg-slate-100 hover:bg-slate-200 transition-colors py-4 rounded-xl flex items-center justify-center gap-2 text-slate-700 font-bold hover:text-slate-900"
-              >
-                Explore Anonymously
-              </button>
-
-               <p className="text-[11px] text-slate-400 text-center font-medium leading-relaxed mt-4">
-                  By joining, you agree to our Terms of Service. All data is end-to-end encrypted.
-               </p>
             </form>
+
+            <button 
+              type="button"
+              onClick={handleAnonymousLogin}
+              disabled={isLoading}
+              className="w-full bg-slate-100 hover:bg-slate-200 transition-colors py-4 rounded-xl flex items-center justify-center gap-2 text-slate-700 font-bold hover:text-slate-900"
+            >
+              Explore Anonymously
+            </button>
 
             <div className="text-center pt-2">
               <p className="text-sm text-slate-500 font-medium">

@@ -95,15 +95,16 @@ export default function LoginPage() {
                 )}
               </button>
 
-              <button 
-                type="button"
-                onClick={handleAnonymousLogin}
-                disabled={isLoading}
-                className="w-full bg-slate-100 hover:bg-slate-200 transition-colors py-4 rounded-xl flex items-center justify-center gap-2 text-slate-700 font-bold hover:text-slate-900 mt-4"
-              >
-                Explore Anonymously
-              </button>
             </form>
+
+            <button 
+              type="button"
+              onClick={handleAnonymousLogin}
+              disabled={isLoading}
+              className="w-full bg-slate-100 hover:bg-slate-200 transition-colors py-4 rounded-xl flex items-center justify-center gap-2 text-slate-700 font-bold hover:text-slate-900"
+            >
+              Explore Anonymously
+            </button>
 
             <div className="text-center pt-2">
               <p className="text-sm text-slate-500 font-medium">
