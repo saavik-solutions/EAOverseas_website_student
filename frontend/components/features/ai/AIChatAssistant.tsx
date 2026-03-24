@@ -56,6 +56,11 @@ export const AIChatAssistant: React.FC = () => {
     setInput('');
     setIsLoading(true);
 
+    // Fetch real profile from localStorage
+    const savedProfile = localStorage.getItem('pai_profile');
+    const savedAnalysis = localStorage.getItem('pai_analysis');
+    const profileContext = savedProfile ? JSON.parse(savedProfile) : (savedAnalysis ? JSON.parse(savedAnalysis) : {});
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -63,7 +68,7 @@ export const AIChatAssistant: React.FC = () => {
         body: JSON.stringify({
           messages: messages.map(m => ({ role: m.role, content: m.content })),
           context: { page: getPageContext() },
-          profile: { gpa: 8.5, budget: 45000, ielts: 7.5 } // Mocked profile context
+          profile: profileContext
         })
       });
 
@@ -93,24 +98,27 @@ export const AIChatAssistant: React.FC = () => {
         
         fullContent += new TextDecoder().decode(value);
         
-        // Dynamic parsing of JSON while streaming is difficult
-        // We update the content of the last message
         setMessages(prev => {
           const newMessages = [...prev];
           const lastMsg = newMessages[newMessages.length - 1];
           
-          // Try to parse if it looks like complete JSON
-          try {
-            // Check if backend pushed HTML due to fatal exception
-            if (fullContent.includes('<!DOCTYPE html>')) {
-              lastMsg.content = "Fatal System Exception. The server returned raw HTML instead of JSON.";
-            } else {
+          if (fullContent.includes('<!DOCTYPE html>')) {
+            lastMsg.content = "Fatal System Exception. The server returned raw HTML instead of JSON.";
+          } else if (fullContent.trim().startsWith('{')) {
+            // It's trying to send JSON. If it's valid, parse it.
+            // If not valid yet, show a placeholder or just the text inside if we can extract it.
+            try {
               const parsed = JSON.parse(fullContent);
               lastMsg.type = parsed.type || 'text';
               lastMsg.content = parsed.data || fullContent;
+            } catch (e) {
+              // While it's incomplete JSON, we'll just show "..." or a cleaned version
+              // This prevents the user from seeing raw {"type": "text", "data": " during streaming
+              lastMsg.content = "EduAI is typing...";
             }
-          } catch (e) {
-            // If not complete JSON, just show as text for now
+          } else {
+            // It's raw text (not JSON), display directly for "Live" feel
+            lastMsg.type = 'text';
             lastMsg.content = fullContent;
           }
           return newMessages;

@@ -54,7 +54,12 @@ export const Sidebar: React.FC<{ className?: string, isOpenMobile?: boolean, onC
         <div className="absolute top-40 -right-20 w-40 h-40 bg-brand-primary/5 blur-[80px] pointer-events-none rounded-full" />
         {/* Logo */}
         <div className="h-20 flex items-center px-4 border-b border-slate-200/50 shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
+          <a 
+            href="https://eaoverseas.com" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity cursor-pointer"
+          >
             <div className="w-9 h-9 shrink-0 bg-brand-primary rounded-lg flex items-center justify-center shadow-lg shadow-brand-primary/20 relative">
               <span className="font-black text-white italic text-base">EA</span>
               <div className="absolute inset-0 bg-white/20 rounded-lg" />
@@ -65,7 +70,7 @@ export const Sidebar: React.FC<{ className?: string, isOpenMobile?: boolean, onC
               <h1 className="font-black text-lg tracking-tight leading-none text-slate-900">EAOverseas</h1>
               <p className="text-[9px] font-bold text-brand-primary uppercase tracking-widest mt-1">Student Portal</p>
             </div>
-          </div>
+          </a>
         </div>
 
         {/* Navigation */}
