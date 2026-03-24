@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Sidebar } from '@/components/features/Sidebar';
 import { SearchBar } from '@/components/features/SearchBar';
 import { NotificationBell } from '@/components/features/NotificationBell';
-import { Menu, X, LogOut, User as UserIcon } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Filter } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -49,6 +49,10 @@ export default function DashboardLayout({
               <Menu className="w-6 h-6" />
             </button>
             <SearchBar />
+            <button className="hidden sm:flex items-center gap-2 p-3 bg-bg-base border border-border rounded-xl text-text-muted hover:text-brand-primary hover:border-brand-primary transition-all shadow-sm">
+              <Filter className="w-4 h-4" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Filter</span>
+            </button>
           </div>
           
           <div className="flex items-center gap-6">
