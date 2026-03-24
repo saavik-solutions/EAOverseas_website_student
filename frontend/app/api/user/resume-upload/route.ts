@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
 import { auth } from '@/lib/auth';
-import pdfParse from 'pdf-parse';
 
 export async function POST(req: Request) {
   try {
@@ -28,8 +27,9 @@ export async function POST(req: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     
-    // Parse PDF to extract text
-    const data = await pdfParse(buffer);
+    // Parse PDF to extract text - Using dynamic require for CommonJS compatibility
+    const pdf = require('pdf-parse');
+    const data = await pdf(buffer);
     const extractedText = data.text;
 
     // Save extracted text to user document

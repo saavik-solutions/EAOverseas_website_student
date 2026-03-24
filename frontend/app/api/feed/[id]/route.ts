@@ -27,7 +27,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     
     let isSavedByCurrentUser = false;
     if (session?.user?.id) {
-      const user = await User.findById(session.user.id).select('savedPosts').lean();
+      const user = await User.findById(session.user.id).select('savedPosts').lean() as any;
       if (user && user.savedPosts) {
         isSavedByCurrentUser = user.savedPosts.some((id: any) => id.toString() === params.id);
       }
