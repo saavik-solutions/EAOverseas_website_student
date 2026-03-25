@@ -4,6 +4,8 @@ import { ApiKey } from '@/lib/db/models/ApiKey';
 import { auth } from '@/lib/auth';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await auth();
